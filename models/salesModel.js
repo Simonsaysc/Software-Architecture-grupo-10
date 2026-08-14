@@ -1,0 +1,10 @@
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
+const Sales = sequelize.define('Sales', {
+    book_name: { type: DataTypes.INTEGER, allowNull: false },
+    quantity: { type: DataTypes.INTEGER, allowNull: false },
+    year: { type: DataTypes.INTEGER, allowNull: false }
+});
+Book.hasMany(Sales, { onDelete: 'CASCADE' });
+Sales.belongsTo(Book);
+module.exports = Sales;
