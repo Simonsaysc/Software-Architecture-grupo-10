@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const sequelize = require('../config/db');
+const Author = require('./authorModel');
 const Book = sequelize.define('Book', {
   title:  { type: DataTypes.STRING, allowNull: false },
   author: { type: DataTypes.STRING, allowNull: false },
