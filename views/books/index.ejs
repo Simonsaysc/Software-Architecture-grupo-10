@@ -1,0 +1,38 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Libros</h2>
+    <a href="/books/new" class="btn btn-primary">+ Nuevo Libro</a>
+  </div>
+
+  <% if (books.length === 0) { %>
+    <div class="alert alert-info">No hay libros registrados.</div>
+  <% } else { %>
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Título</th>
+          <th>Género</th>
+          <th>Fecha de lanzamiento</th>
+          <th>Autor</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% books.forEach(book => { %>
+          <tr>
+            <td><a href="/books/<%= book.id %>"><%= book.title %></a></td>
+            <td><%= book.genre || 'N/A' %></td>
+            <td><%= book.release_date || 'N/A' %></td>
+            <td><%= book.Author ? book.Author.name : 'N/A' %></td>
+            <td>
+              <a href="/books/<%= book.id %>/edit" class="btn btn-sm btn-warning">Editar</a>
+              <form action="/books/<%= book.id %>/delete" method="POST" style="display:inline">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este libro?')">Eliminar</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>

@@ -11,8 +11,9 @@ const { body, query, param } = require("express-validator");
 const app = express();
 const port = 3000;
 
-// Middleware to parse JSON request bodies
+// Middleware to parse request bodies
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Configurar el motor de vistas EJS
 app.set('views', path.join(__dirname, 'views'));

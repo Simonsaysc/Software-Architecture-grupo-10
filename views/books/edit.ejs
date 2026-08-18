@@ -1,0 +1,38 @@
+<div class="container mt-4">
+  <h2>Editar Libro</h2>
+
+  <form action="/books/<%= book.id %>/edit" method="POST">
+    <div class="mb-3">
+      <label for="title" class="form-label">Título</label>
+      <input type="text" class="form-control" id="title" name="title" value="<%= book.title %>" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="genre" class="form-label">Género</label>
+      <input type="text" class="form-control" id="genre" name="genre" value="<%= book.genre || '' %>">
+    </div>
+
+    <div class="mb-3">
+      <label for="summary" class="form-label">Resumen</label>
+      <textarea class="form-control" id="summary" name="summary" rows="4"><%= book.summary || '' %></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="release_date" class="form-label">Fecha de lanzamiento</label>
+      <input type="date" class="form-control" id="release_date" name="release_date" value="<%= book.release_date || '' %>">
+    </div>
+
+    <div class="mb-3">
+      <label for="AuthorId" class="form-label">Autor</label>
+      <select class="form-select" id="AuthorId" name="AuthorId">
+        <option value="">-- Seleccionar autor --</option>
+        <% authors.forEach(author => { %>
+          <option value="<%= author.id %>" <%= book.AuthorId === author.id ? 'selected' : '' %>><%= author.name %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a href="/books/<%= book.id %>" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>

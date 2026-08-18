@@ -2,10 +2,15 @@ const express = require('express');
 const router = express.Router();
 const bookController = require('../controllers/bookController');
 
-router.get('/',       bookController.getAllBooks);
-router.get('/:id',    bookController.getBookById);
-router.post('/',      bookController.createBook);
-router.put('/:id',    bookController.updateBook);
-router.delete('/:id', bookController.deleteBook);
+// Vistas
+router.get('/',          bookController.index);       // lista de libros
+router.get('/new',       bookController.newForm);     // formulario crear
+router.get('/:id',       bookController.show);        // detalle de un libro
+router.get('/:id/edit',  bookController.editForm);    // formulario editar
+
+// Acciones de formulario (POST)
+router.post('/',             bookController.create);   // crear
+router.post('/:id/edit',     bookController.update);   // actualizar
+router.post('/:id/delete',   bookController.destroy);  // eliminar
 
 module.exports = router;
