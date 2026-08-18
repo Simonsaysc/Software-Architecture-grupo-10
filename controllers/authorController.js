@@ -4,7 +4,7 @@ const Author = require('../models/authorModel');
 exports.getAllAuthors = async (req, res) => {
   try {
     const authors = await Author.findAll();
-    res.json(authors);
+    res.render('authors', { title: 'Authors', authors }); // Render the authors view with the list of authors
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -15,7 +15,7 @@ exports.getAuthorById = async (req, res) => {
   try {
     const author = await Author.findByPk(req.params.id);
     if (!author) return res.status(404).json({ error: 'Author not found' });
-    res.json(author);
+    res.render('author', { title: 'Author Details', author }); // Render the author view with the author's details
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
