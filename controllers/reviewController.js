@@ -1,61 +1,88 @@
 const Review = require('../models/reviewModel');
+const Book = require('../models/bookModel');
 
-// GET /books/:bookId/reviews
-exports.getReviewsByBook = async (req, res) => {
+// Página: lista de todas las reseñas
+exports.index = async (req, res) => {
   try {
-    const reviews = await Review.findAll({ where: { BookId: req.params.bookId } });
-    res.json(reviews);
+    const reviews = await Review.findAll({ include: Book });
+    res.render('reviews/index', { title: 'Reseñas', reviews });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// GET /books/:bookId/reviews/:id
-exports.getReviewById = async (req, res) => {
+// Página: detalle de una reseña
+exports.show = async (req, res) => {
   try {
     const review = await Review.findOne({
       where: { id: req.params.id, BookId: req.params.bookId }
     });
-    if (!review) return res.status(404).json({ error: 'Review not found' });
-    res.json(review);
+    if (!review) return res.status(404).send('Reseña no encontrada');
+    const book = await Book.findByPk(req.params.bookId);
+    res.render('reviews/show', { title: 'Reseña', review, book });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// POST /books/:bookId/reviews
-exports.createReview = async (req, res) => {
+// Página: formulario nueva reseña
+exports.newForm = async (req, res) => {
   try {
-    const review = await Review.create({ ...req.body, BookId: req.params.bookId });
-    res.status(201).json(review);
+    const book = await Book.findByPk(req.params.bookId);
+    if (!book) return res.status(404).send('Libro no encontrado');
+    res.render('reviews/new', { title: 'Nueva Reseña', book });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Acción: crear reseña (recibe formulario)
+exports.create = async (req, res) => {
+  try {
+    await Review.create({ ...req.body, BookId: req.params.bookId });
+    res.redirect('/books/' + req.params.bookId);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-// PUT /books/:bookId/reviews/:id
-exports.updateReview = async (req, res) => {
+// Página: formulario editar reseña
+exports.editForm = async (req, res) => {
   try {
     const review = await Review.findOne({
       where: { id: req.params.id, BookId: req.params.bookId }
     });
-    if (!review) return res.status(404).json({ error: 'Review not found' });
+    if (!review) return res.status(404).send('Reseña no encontrada');
+    const book = await Book.findByPk(req.params.bookId);
+    res.render('reviews/edit', { title: 'Editar Reseña', review, book });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Acción: actualizar reseña (recibe formulario)
+exports.update = async (req, res) => {
+  try {
+    const review = await Review.findOne({
+      where: { id: req.params.id, BookId: req.params.bookId }
+    });
+    if (!review) return res.status(404).send('Reseña no encontrada');
     await review.update(req.body);
-    res.json(review);
+    res.redirect('/books/' + req.params.bookId);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-// DELETE /books/:bookId/reviews/:id
-exports.deleteReview = async (req, res) => {
+// Acción: eliminar reseña
+exports.destroy = async (req, res) => {
   try {
     const review = await Review.findOne({
       where: { id: req.params.id, BookId: req.params.bookId }
     });
-    if (!review) return res.status(404).json({ error: 'Review not found' });
+    if (!review) return res.status(404).send('Reseña no encontrada');
     await review.destroy();
-    res.json({ message: 'Review deleted successfully' });
+    res.redirect('/books/' + req.params.bookId);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

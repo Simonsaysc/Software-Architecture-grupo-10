@@ -1,0 +1,15 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-body">
+      <h2>Reseña de "<%= book.title %>"</h2>
+      <hr>
+      <p><strong>Reviewer:</strong> <%= review.reviewer_name %></p>
+      <p><strong>Calificación:</strong> <% for (let i = 0; i < review.rating; i++) { %>⭐<% } %> (<%= review.rating %>/5)</p>
+      <p><strong>Comentario:</strong> <%= review.comment %></p>
+      <p><strong>Votos positivos:</strong> 👍 <%= review.up_votes %></p>
+
+      <a href="/books/<%= book.id %>/reviews/<%= review.id %>/edit" class="btn btn-warning">Editar</a>
+      <a href="/books/<%= book.id %>" class="btn btn-secondary">← Volver al libro</a>
+    </div>
+  </div>
+</div>

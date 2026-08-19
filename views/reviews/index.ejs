@@ -1,0 +1,38 @@
+<div class="container mt-4">
+  <h2>Reseñas</h2>
+
+  <% if (reviews.length === 0) { %>
+    <div class="alert alert-info">No hay reseñas registradas.</div>
+  <% } else { %>
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Libro</th>
+          <th>Reviewer</th>
+          <th>Rating</th>
+          <th>Comentario</th>
+          <th>👍</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% reviews.forEach(review => { %>
+          <tr>
+            <td><a href="/books/<%= review.BookId %>"><%= review.Book ? review.Book.title : 'N/A' %></a></td>
+            <td><%= review.reviewer_name %></td>
+            <td><% for (let i = 0; i < review.rating; i++) { %>⭐<% } %></td>
+            <td><%= review.comment %></td>
+            <td><%= review.up_votes %></td>
+            <td>
+              <a href="/books/<%= review.BookId %>/reviews/<%= review.id %>" class="btn btn-sm btn-info">Ver</a>
+              <a href="/books/<%= review.BookId %>/reviews/<%= review.id %>/edit" class="btn btn-sm btn-warning">Editar</a>
+              <form action="/books/<%= review.BookId %>/reviews/<%= review.id %>/delete" method="POST" style="display:inline">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar esta reseña?')">Eliminar</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>

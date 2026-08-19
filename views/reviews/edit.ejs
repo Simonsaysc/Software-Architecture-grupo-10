@@ -1,0 +1,27 @@
+<div class="container mt-4">
+  <h2>Editar Reseña</h2>
+
+  <form action="/books/<%= book.id %>/reviews/<%= review.id %>/edit" method="POST">
+    <div class="mb-3">
+      <label for="reviewer_name" class="form-label">Tu nombre</label>
+      <input type="text" class="form-control" id="reviewer_name" name="reviewer_name" value="<%= review.reviewer_name %>" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="rating" class="form-label">Calificación</label>
+      <select class="form-select" id="rating" name="rating" required>
+        <% for (let i = 5; i >= 1; i--) { %>
+          <option value="<%= i %>" <%= review.rating === i ? 'selected' : '' %>><%= '⭐'.repeat(i) %> (<%= i %>)</option>
+        <% } %>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="comment" class="form-label">Comentario</label>
+      <textarea class="form-control" id="comment" name="comment" rows="4" required><%= review.comment %></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a href="/books/<%= book.id %>" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>

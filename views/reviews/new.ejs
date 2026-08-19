@@ -1,0 +1,30 @@
+<div class="container mt-4">
+  <h2>Nueva Reseña para "<%= book.title %>"</h2>
+
+  <form action="/books/<%= book.id %>/reviews" method="POST">
+    <div class="mb-3">
+      <label for="reviewer_name" class="form-label">Tu nombre</label>
+      <input type="text" class="form-control" id="reviewer_name" name="reviewer_name" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="rating" class="form-label">Calificación</label>
+      <select class="form-select" id="rating" name="rating" required>
+        <option value="">-- Seleccionar --</option>
+        <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+        <option value="4">⭐⭐⭐⭐ (4)</option>
+        <option value="3">⭐⭐⭐ (3)</option>
+        <option value="2">⭐⭐ (2)</option>
+        <option value="1">⭐ (1)</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="comment" class="form-label">Comentario</label>
+      <textarea class="form-control" id="comment" name="comment" rows="4" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Publicar Reseña</button>
+    <a href="/books/<%= book.id %>" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
