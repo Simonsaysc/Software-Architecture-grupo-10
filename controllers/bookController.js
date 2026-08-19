@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const Book = require('../models/bookModel');
 const Author = require('../models/authorModel');
 const Review = require('../models/reviewModel');
@@ -7,6 +8,50 @@ exports.index = async (req, res) => {
   try {
     const books = await Book.findAll({ include: Author });
     res.render('books/index', { title: 'Libros', books });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Página: Búsqueda paginada de libros por palabras en sus resúmenes
+exports.search = async (req, res) => {
+  try {
+    const q = req.query.q ? req.query.q.trim() : '';
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = 5; // 5 resultados por página
+    const offset = (page - 1) * limit;
+
+    let whereClause = {};
+
+    if (q) {
+      const words = q.split(/\s+/).filter(w => w.length > 0);
+      if (words.length > 0) {
+        whereClause = {
+          [Op.and]: words.map(word => ({
+            summary: { [Op.iLike]: `%${word}%` }
+          }))
+        };
+      }
+    }
+
+    const { count, rows: books } = await Book.findAndCountAll({
+      where: whereClause,
+      include: [Author],
+      limit,
+      offset,
+      order: [['id', 'DESC']]
+    });
+
+    const totalPages = Math.ceil(count / limit) || 1;
+
+    res.render('books/search', {
+      title: 'Búsqueda de Libros',
+      query: q,
+      books,
+      currentPage: page,
+      totalPages,
+      totalResults: count
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

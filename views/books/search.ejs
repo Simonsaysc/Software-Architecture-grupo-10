@@ -1,0 +1,86 @@
+<div class="container mt-4">
+  <h2>🔍 Búsqueda de Libros por Resumen</h2>
+  <p class="text-muted">Busca palabras clave en los resúmenes de los libros.</p>
+
+  <!-- Formulario de Búsqueda -->
+  <form action="/books/search" method="GET" class="row g-2 mb-4">
+    <div class="col-sm-9 col-md-10">
+      <input 
+        type="text" 
+        name="q" 
+        class="form-control form-control-lg" 
+        placeholder="Escribe una o varias palabras..." 
+        value="<%= query %>"
+        required
+      >
+    </div>
+    <div class="col-sm-3 col-md-2">
+      <button type="submit" class="btn btn-primary btn-lg w-100">Buscar</button>
+    </div>
+  </form>
+
+  <% if (query) { %>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5>
+        Resultados para: <em>"<%= query %>"</em>
+      </h5>
+      <span class="badge bg-secondary">Total: <%= totalResults %> libro<%= totalResults === 1 ? '' : 's' %></span>
+    </div>
+
+    <% if (books.length === 0) { %>
+      <div class="alert alert-warning">
+        No se encontraron libros cuyos resúmenes contengan las palabras <strong>"<%= query %>"</strong>.
+      </div>
+    <% } else { %>
+      <div class="list-group mb-4">
+        <% books.forEach(book => { %>
+          <div class="list-group-item list-group-item-action p-3">
+            <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+              <h5 class="mb-1">
+                <a href="/books/<%= book.id %>" class="text-decoration-none"><%= book.title %></a>
+              </h5>
+              <small class="text-muted"><%= book.release_date || 'Sin fecha' %></small>
+            </div>
+            <p class="mb-1 text-secondary">
+              <strong>Autor:</strong> <%= book.Author ? book.Author.name : 'Desconocido' %> | 
+              <strong>Género:</strong> <%= book.genre || 'N/A' %>
+            </p>
+            <p class="mb-1 mt-2 bg-light p-2 rounded border">
+              <small class="text-dark">
+                <strong>Resumen:</strong> <%= book.summary || 'Sin resumen disponible.' %>
+              </small>
+            </p>
+          </div>
+        <% }) %>
+      </div>
+
+      <!-- Paginación -->
+      <% if (totalPages > 1) { %>
+        <nav aria-label="Navegación de resultados">
+          <ul class="pagination justify-content-center">
+            <!-- Botón Anterior -->
+            <li class="page-item <%= currentPage <= 1 ? 'disabled' : '' %>">
+              <a class="page-link" href="/books/search?q=<%= encodeURIComponent(query) %>&page=<%= currentPage - 1 %>">Anterior</a>
+            </li>
+
+            <!-- Páginas numeradas -->
+            <% for (let i = 1; i <= totalPages; i++) { %>
+              <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                <a class="page-link" href="/books/search?q=<%= encodeURIComponent(query) %>&page=<%= i %>"><%= i %></a>
+              </li>
+            <% } %>
+
+            <!-- Botón Siguiente -->
+            <li class="page-item <%= currentPage >= totalPages ? 'disabled' : '' %>">
+              <a class="page-link" href="/books/search?q=<%= encodeURIComponent(query) %>&page=<%= currentPage + 1 %>">Siguiente</a>
+            </li>
+          </ul>
+        </nav>
+      <% } %>
+    <% } %>
+  <% } else { %>
+    <div class="alert alert-info">
+      Ingresa una o más palabras en la barra de búsqueda para explorar los resúmenes.
+    </div>
+  <% } %>
+</div>

@@ -5,6 +5,7 @@ const bookController = require('../controllers/bookController');
 // Vistas
 router.get('/',          bookController.index);       // lista de libros
 router.get('/new',       bookController.newForm);     // formulario crear
+router.get('/search',    bookController.search);      // búsqueda paginada por palabras en resúmenes
 router.get('/:id',       bookController.show);        // detalle de un libro
 router.get('/:id/edit',  bookController.editForm);    // formulario editar
 
