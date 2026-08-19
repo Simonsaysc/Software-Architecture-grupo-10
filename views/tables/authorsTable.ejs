@@ -1,0 +1,51 @@
+<div class="container mt-4">
+  <h2>Authors Table</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th><button class="btn btn-link p-0" onclick="sortByAuthorName()">Author</button></th>
+        <th><button class="btn btn-link p-0" onclick="sortByBooksCount()">Number of Books</button></th>
+        <th><button class="btn btn-link p-0" onclick="sortByAverageScore()">Average Score</button></th>
+        <th><button class="btn btn-link p-0" onclick="sortByTotalSales()">Total Sales</button></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% authors.forEach(author => { %>
+        <tr>
+          <td><%= author.name %></td>
+          <td><%= author.booksCount %></td>
+          <td><%= author.averageScore.toFixed(2) %></td>
+          <td><%= author.totalSales %></td>
+        </tr>
+      <% }) %>
+</div>
+
+<script>
+  function sortByBooksCount() {
+    const table = document.querySelector('table');
+    const rows = Array.from(table.rows).slice(1); // Exclude header row
+    rows.sort((a, b) => parseInt(b.cells[1].textContent) - parseInt(a.cells[1].textContent));
+    rows.forEach(row => table.appendChild(row));
+  }
+
+  function sortByAuthorName() {
+    const table = document.querySelector('table');
+    const rows = Array.from(table.rows).slice(1); // Exclude header row
+    rows.sort((a, b) => a.cells[0].textContent.localeCompare(b.cells[0].textContent));
+    rows.forEach(row => table.appendChild(row));
+  }
+
+  function sortByAverageScore() {
+    const table = document.querySelector('table');
+    const rows = Array.from(table.rows).slice(1); // Exclude header row
+    rows.sort((a, b) => parseFloat(b.cells[2].textContent) - parseFloat(a.cells[2].textContent));
+    rows.forEach(row => table.appendChild(row));
+  }
+
+  function sortByTotalSales() {
+    const table = document.querySelector('table');
+    const rows = Array.from(table.rows).slice(1); // Exclude header row
+    rows.sort((a, b) => parseInt(b.cells[3].textContent) - parseInt(a.cells[3].textContent));
+    rows.forEach(row => table.appendChild(row));
+  }
+</script>
