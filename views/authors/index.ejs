@@ -1,0 +1,36 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Autores</h2>
+    <a href="/authors/new" class="btn btn-primary">+ Nuevo Autor</a>
+  </div>
+
+  <% if (authors.length === 0) { %>
+    <div class="alert alert-info">No hay autores registrados.</div>
+  <% } else { %>
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Nombre</th>
+          <th>País</th>
+          <th>Fecha de nacimiento</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% authors.forEach(author => { %>
+          <tr>
+            <td><a href="/authors/<%= author.id %>"><%= author.name %></a></td>
+            <td><%= author.country %></td>
+            <td><%= author.birthdate || 'N/A' %></td>
+            <td>
+              <a href="/authors/<%= author.id %>/edit" class="btn btn-sm btn-warning">Editar</a>
+              <form action="/authors/<%= author.id %>/delete" method="POST" style="display:inline">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este autor?')">Eliminar</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>

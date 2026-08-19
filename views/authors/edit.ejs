@@ -1,39 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-</head>
-<body>
+<div class="container mt-4">
+  <h2>Editar Autor</h2>
 
-  <button onclick="location.href='/authors'">Back to Authors List</button>
+  <form action="/authors/<%= author.id %>/edit" method="POST">
+    <div class="mb-3">
+      <label for="name" class="form-label">Nombre</label>
+      <input type="text" class="form-control" id="name" name="name" value="<%= author.name %>" required>
+    </div>
 
-  <div class="container">
-    <h1>Edit Author</h1>
-    <form action="/authors/<%= author.id %>/edit" method="POST">
-      <input type="hidden" name="_method" value="PUT">
-      <div class="form-group">
-        <label for="name" class="form-label">Name:</label>
-        <input type="text" class="form-control" id="name" name="name" value="<%= author.name %>">
-      </div>
-      <div class="form-group">
-        <label for="bio" class="form-label">Bio:</label>
-        <textarea class="form-control" id="bio" name="bio"><%= author.bio %></textarea>
-      </div>
-      <div class="form-group">
-        <label for="birthday" class="form-label">Date of Birth:</label>
-        <input type="date" class="form-control" id="birthday" name="birthday" value="<%= author.birthday %>">
-      </div>
-      <div class="form-group">
-        <label for="country" class="form-label">Country of Origin:</label>
-        <input type="text" class="form-control" id="country" name="country" value="<%= author.country %>">
-      </div>
-      <button type="submit" class="btn btn-primary">Update Author</button>
-    </form>
-  </div>
+    <div class="mb-3">
+      <label for="country" class="form-label">País</label>
+      <input type="text" class="form-control" id="country" name="country" value="<%= author.country %>" required>
+    </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="mb-3">
+      <label for="birthdate" class="form-label">Fecha de nacimiento</label>
+      <input type="date" class="form-control" id="birthdate" name="birthdate" value="<%= author.birthdate || '' %>">
+    </div>
 
-</body>
-</html>
+    <div class="mb-3">
+      <label for="bio" class="form-label">Biografía</label>
+      <textarea class="form-control" id="bio" name="bio" rows="4"><%= author.bio || '' %></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a href="/authors/<%= author.id %>" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>

@@ -1,77 +1,74 @@
 const Author = require('../models/authorModel');
 const Book = require('../models/bookModel');
 
-// GET /authors
-exports.getAllAuthors = async (req, res) => {
+// Página: lista de autores
+exports.index = async (req, res) => {
   try {
     const authors = await Author.findAll();
-    res.render('authors/authors', { title: 'Authors', authors }); // Render the authors view with the list of authors
+    res.render('authors/index', { title: 'Autores', authors });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// GET /authors/:id
-exports.getAuthorById = async (req, res) => {
+// Página: detalle de un autor
+exports.show = async (req, res) => {
   try {
     const author = await Author.findByPk(req.params.id, {
-      include: [{
-        model: Book,
-        as: 'Books'
-      }]
+      include: [{ model: Book }]
     });
-    if (!author) return res.status(404).json({ error: 'Author not found' });
-    res.render('authors/author', { title: 'Author Details', author }); // Render the author view with the author's details
+    if (!author) return res.status(404).send('Autor no encontrado');
+    res.render('authors/show', { title: author.name, author });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// GET /authors/new
-exports.newForm = async (req, res) => {
-  res.render('authors/new', { title: 'New Author' }); // Render the new author form view
+// Página: formulario nuevo autor
+exports.newForm = (req, res) => {
+  res.render('authors/new', { title: 'Nuevo Autor' });
 };
 
-// GET /authors/:id/edit
+// Acción: crear autor (recibe formulario)
+exports.create = async (req, res) => {
+  try {
+    await Author.create(req.body);
+    res.redirect('/authors');
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Página: formulario editar autor
 exports.editForm = async (req, res) => {
   try {
     const author = await Author.findByPk(req.params.id);
-    if (!author) return res.status(404).json({ error: 'Author not found' });
-    res.render('authors/edit', { title: 'Edit Author', author }); // Render the edit author form view with the author's details
+    if (!author) return res.status(404).send('Autor no encontrado');
+    res.render('authors/edit', { title: 'Editar Autor', author });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// POST /authors
-exports.createAuthor = async (req, res) => {
+// Acción: actualizar autor (recibe formulario)
+exports.update = async (req, res) => {
   try {
-    await Author.create(req.body);
-    res.redirect('/authors'); // Redirect to the authors list after successful creation
+    const author = await Author.findByPk(req.params.id);
+    if (!author) return res.status(404).send('Autor no encontrado');
+    await author.update(req.body);
+    res.redirect('/authors/' + author.id);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-// PUT /authors/:id
-exports.updateAuthor = async (req, res) => {
+// Acción: eliminar autor
+exports.destroy = async (req, res) => {
   try {
     const author = await Author.findByPk(req.params.id);
-    if (!author) return res.status(404).json({ error: 'Author not found' });
-    await author.update(req.body);
-    res.redirect(`/authors/${req.params.id}`); // Redirect to the author's details page after successful update
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-}
-
-// DELETE /authors/:id
-exports.deleteAuthor = async (req, res) => {
-  try {
-    const author = await Author.findByPk(req.params.id);
-    if (!author) return res.status(404).json({ error: 'Author not found' });
+    if (!author) return res.status(404).send('Autor no encontrado');
     await author.destroy();
-    res.json({ message: 'Author deleted successfully' });
+    res.redirect('/authors');
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

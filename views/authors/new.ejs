@@ -1,31 +1,28 @@
-<div class="container mt-5">
-  <h1>New Author</h1>
+<div class="container mt-4">
+  <h2>Nuevo Autor</h2>
 
   <form action="/authors" method="POST">
-
     <div class="mb-3">
-      <label for="name" class="form-label">Name:</label>
-      <input type="text" id="name" name="name" class="form-control" required>
+      <label for="name" class="form-label">Nombre</label>
+      <input type="text" class="form-control" id="name" name="name" required>
     </div>
 
     <div class="mb-3">
-      <label for="bio" class="form-label">Bio:</label>
-      <textarea id="bio" name="bio" class="form-control" required></textarea>
+      <label for="country" class="form-label">País</label>
+      <input type="text" class="form-control" id="country" name="country" required>
     </div>
 
     <div class="mb-3">
-      <label for="birthday" class="form-label">Date of Birth:</label>
-      <select id="birthday" name="birthday" class="form-control" required>
-        <% for (let year = 1900; year <= new Date().getFullYear(); year++) { %>
-          <option value="<%= year %>"><%= year %></option>
-        <% } %>
-      </select>
+      <label for="birthdate" class="form-label">Fecha de nacimiento</label>
+      <input type="date" class="form-control" id="birthdate" name="birthdate">
     </div>
 
     <div class="mb-3">
-      <label for="country" class="form-label">Country of Origin:</label>
-      <input type="text" id="country" name="country" class="form-control" required>
+      <label for="bio" class="form-label">Biografía</label>
+      <textarea class="form-control" id="bio" name="bio" rows="4"></textarea>
     </div>
 
-    <button type="submit">Create Author</button>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/authors" class="btn btn-secondary">Cancelar</a>
+  </form>
 </div>
