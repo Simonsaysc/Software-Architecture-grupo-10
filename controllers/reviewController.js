@@ -1,62 +1,87 @@
 const Review = require('../models/reviewModel');
+const Book = require('../models/bookModel');
 
 // GET /books/:bookId/reviews
-exports.getReviewsByBook = async (req, res) => {
+exports.index = async (req, res) => {
   try {
-    const reviews = await Review.findAll({ where: { BookId: req.params.bookId } });
-    res.json(reviews);
+    const book = await Book.findByPk(req.params.bookId);
+    if (!book) return res.status(404).send('Libro no encontrado');
+    const reviews = await Review.findAll({
+      where: { BookId: req.params.bookId },
+      order: [['id', 'DESC']],
+    });
+    res.render('reviews/index', { book, reviews });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).send('Error: ' + error.message);
   }
 };
 
-// GET /books/:bookId/reviews/:id
-exports.getReviewById = async (req, res) => {
+// GET /books/:bookId/reviews/new
+exports.newForm = async (req, res) => {
   try {
-    const review = await Review.findOne({
-      where: { id: req.params.id, BookId: req.params.bookId }
-    });
-    if (!review) return res.status(404).json({ error: 'Review not found' });
-    res.json(review);
+    const book = await Book.findByPk(req.params.bookId);
+    if (!book) return res.status(404).send('Libro no encontrado');
+    res.render('reviews/new', { book });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).send('Error: ' + error.message);
   }
 };
 
 // POST /books/:bookId/reviews
-exports.createReview = async (req, res) => {
+exports.create = async (req, res) => {
   try {
-    const review = await Review.create({ ...req.body, BookId: req.params.bookId });
-    res.status(201).json(review);
+    const { rating, comment, reviewer_name, up_votes } = req.body;
+    await Review.create({
+      rating: parseInt(rating, 10),
+      comment,
+      reviewer_name,
+      up_votes: up_votes ? parseInt(up_votes, 10) : 0,
+      BookId: req.params.bookId,
+    });
+    res.redirect(`/books/${req.params.bookId}/reviews`);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).send('Error: ' + error.message);
   }
 };
 
-// PUT /books/:bookId/reviews/:id
-exports.updateReview = async (req, res) => {
+// GET /books/:bookId/reviews/:id/edit
+exports.editForm = async (req, res) => {
   try {
-    const review = await Review.findOne({
-      where: { id: req.params.id, BookId: req.params.bookId }
-    });
-    if (!review) return res.status(404).json({ error: 'Review not found' });
-    await review.update(req.body);
-    res.json(review);
+    const book = await Book.findByPk(req.params.bookId);
+    const review = await Review.findOne({ where: { id: req.params.id, BookId: req.params.bookId } });
+    if (!book || !review) return res.status(404).send('No encontrado');
+    res.render('reviews/edit', { book, review });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).send('Error: ' + error.message);
   }
 };
 
-// DELETE /books/:bookId/reviews/:id
-exports.deleteReview = async (req, res) => {
+// POST /books/:bookId/reviews/:id/edit
+exports.update = async (req, res) => {
   try {
-    const review = await Review.findOne({
-      where: { id: req.params.id, BookId: req.params.bookId }
+    const review = await Review.findOne({ where: { id: req.params.id, BookId: req.params.bookId } });
+    if (!review) return res.status(404).send('No encontrado');
+    const { rating, comment, reviewer_name, up_votes } = req.body;
+    await review.update({
+      rating: parseInt(rating, 10),
+      comment,
+      reviewer_name,
+      up_votes: up_votes ? parseInt(up_votes, 10) : 0,
     });
-    if (!review) return res.status(404).json({ error: 'Review not found' });
+    res.redirect(`/books/${req.params.bookId}/reviews`);
+  } catch (error) {
+    res.status(400).send('Error: ' + error.message);
+  }
+};
+
+// POST /books/:bookId/reviews/:id/delete
+exports.destroy = async (req, res) => {
+  try {
+    const review = await Review.findOne({ where: { id: req.params.id, BookId: req.params.bookId } });
+    if (!review) return res.status(404).send('No encontrado');
     await review.destroy();
-    res.json({ message: 'Review deleted successfully' });
+    res.redirect(`/books/${req.params.bookId}/reviews`);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).send('Error: ' + error.message);
   }
 };

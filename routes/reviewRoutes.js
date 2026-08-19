@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router({ mergeParams: true });
 const reviewController = require('../controllers/reviewController');
 
-router.get('/',       reviewController.getReviewsByBook);
-router.get('/:id',    reviewController.getReviewById);
-router.post('/',      reviewController.createReview);
-router.put('/:id',    reviewController.updateReview);
-router.delete('/:id', reviewController.deleteReview);
+router.get('/',           reviewController.index);      // listado de reviews del libro
+router.get('/new',        reviewController.newForm);    // formulario nueva review
+router.post('/',          reviewController.create);     // crear
+router.get('/:id/edit',   reviewController.editForm);   // formulario editar
+router.post('/:id/edit',  reviewController.update);     // actualizar
+router.post('/:id/delete', reviewController.destroy);   // eliminar
 
 module.exports = router;

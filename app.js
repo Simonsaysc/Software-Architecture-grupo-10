@@ -5,12 +5,15 @@ const bookRoutes = require('./routes/bookRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const authorRoutes = require('./routes/authorRoutes');
 const salesRoutes = require('./routes/salesRoutes');
+const checkController = require('./controllers/checkController');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-// Middleware to parse JSON request bodies
+// Middleware to parse JSON request bodies and HTML form submissions
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.set('view engine', 'ejs');
 
 // Serve the homepage
 app.get('/', (req, res) => {
@@ -22,6 +25,7 @@ app.use('/books', bookRoutes);
 app.use('/books/:bookId/reviews', reviewRoutes);
 app.use('/authors', authorRoutes);
 app.use('/sales', salesRoutes);
+app.get('/check', checkController.showCheck);
 
 // Sync database and start server
 sequelize.sync().then(() => {

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reviews - <%= book.title %></title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; font-size: 14px; }
+    th { background: #f2f2f2; }
+    form.inline { display: inline; }
+  </style>
+</head>
+<body>
+  <p><a href="/books">&larr; Volver a libros</a></p>
+  <h1>Reviews de "<%= book.title %>"</h1>
+  <p><a href="/books/<%= book.id %>/reviews/new">+ Nueva review</a></p>
+
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Rating</th><th>Comentario</th><th>Reviewer</th><th>Up-votes</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      <% reviews.forEach(function(review) { %>
+        <tr>
+          <td><%= review.id %></td>
+          <td><%= review.rating %></td>
+          <td><%= review.comment %></td>
+          <td><%= review.reviewer_name %></td>
+          <td><%= review.up_votes %></td>
+          <td>
+            <a href="/books/<%= book.id %>/reviews/<%= review.id %>/edit">Editar</a>
+            <form class="inline" method="POST" action="/books/<%= book.id %>/reviews/<%= review.id %>/delete" onsubmit="return confirm('¿Borrar esta review?');">
+              <button type="submit">Borrar</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+      <% if (reviews.length === 0) { %>
+        <tr><td colspan="6">Este libro todavía no tiene reviews.</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+</body>
+</html>

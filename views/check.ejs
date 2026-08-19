@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Seed check</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; font-size: 14px; }
+    th { background: #f2f2f2; }
+    .totals span { margin-right: 1.5rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Seed check</h1>
+  <div class="totals">
+    <span>Authors: <%= totals.authors %></span>
+    <span>Books: <%= totals.books %></span>
+    <span>Reviews: <%= totals.reviews %></span>
+    <span>Sales rows: <%= totals.salesRows %></span>
+  </div>
+
+  <p>Mostrando los primeros <%= rows.length %> libros:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Título</th><th>Autor</th><th>Publicación</th>
+        <th># Reviews</th><th>Rating prom.</th><th># Años de ventas</th>
+        <th>Ventas totales (Sales)</th><th>Book.sales</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% rows.forEach(function(row) { %>
+        <tr>
+          <td><%= row.id %></td>
+          <td><%= row.title %></td>
+          <td><%= row.author %></td>
+          <td><%= row.releaseDate %></td>
+          <td><%= row.reviewCount %></td>
+          <td><%= row.avgRating %></td>
+          <td><%= row.salesYears %></td>
+          <td><%= row.totalSalesQty %></td>
+          <td><%= row.bookSalesField %></td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</body>
+</html>

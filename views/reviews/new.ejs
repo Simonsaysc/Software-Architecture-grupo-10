@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nueva review - <%= book.title %></title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; max-width: 500px; }
+    label { display: block; margin-top: 1rem; font-weight: bold; }
+    input, textarea { width: 100%; padding: 6px; box-sizing: border-box; }
+    button { margin-top: 1.5rem; padding: 8px 16px; }
+  </style>
+</head>
+<body>
+  <p><a href="/books/<%= book.id %>/reviews">&larr; Volver a reviews</a></p>
+  <h1>Nueva review para "<%= book.title %>"</h1>
+
+  <form method="POST" action="/books/<%= book.id %>/reviews">
+    <label>Rating (1-5)</label>
+    <input type="number" name="rating" min="1" max="5" required>
+
+    <label>Comentario</label>
+    <textarea name="comment" rows="4"></textarea>
+
+    <label>Nombre del reviewer</label>
+    <input type="text" name="reviewer_name" required>
+
+    <label>Up-votes</label>
+    <input type="number" name="up_votes" min="0" value="0">
+
+    <button type="submit">Guardar</button>
+  </form>
+</body>
+</html>
