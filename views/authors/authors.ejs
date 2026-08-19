@@ -7,6 +7,8 @@
   </head>
   <body>
       <h1>Authors List</h1>
+      <button onclick="createAuthor()">Create New Author</button>
+      <!-- <a href="/authors/new">Create New Author Page</a> -->
       <table class="table">
           <thead>
               <tr>
@@ -23,6 +25,7 @@
                       <td onclick="sortTable(1)"><%= author.total_books || 0 %></td>
                       <td onclick="sortTable(2)"><%= author.average_score || 0 %></td>
                       <td onclick="sortTable(3)"><%= author.total_sales || 0 %></td>
+                      <td><button onclick="deleteAuthor(<%= author.id %>)">Delete</button></td>
                   </tr>
               <% }); %>
           </tbody>
@@ -41,6 +44,40 @@
 
           // Append sorted rows back to the table
           rows.forEach(row => table.appendChild(row));
+        }
+
+        function createAuthor() {
+            const name = prompt('Enter author name:');
+            const bio = prompt('Enter author bio:');
+            const birthday = prompt('Enter author birthday (YYYY-MM-DD):');
+            const country = prompt('Enter author country:');
+    
+            if (name && bio && birthday && country) {
+                fetch('/authors', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, bio, birthday, country })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+            }
+        }
+
+        async function deleteAuthor(authorId) {
+          if (confirm('Are you sure you want to delete this author?')) {
+              await fetch(`/authors/${authorId}`, {
+                  method: 'DELETE',
+                  headers: { 'Content-Type': 'application/json' }
+              });
+              location.reload();
+          }
         }
       </script>
   </body>

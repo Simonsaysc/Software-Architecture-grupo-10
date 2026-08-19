@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+</head>
+<body>
+
+  <button onclick="location.href='/authors'">Back to Authors List</button>
+
+  <div class="container">
+    <h1>Edit Author</h1>
+    <form action="/authors/<%= author.id %>/edit" method="POST">
+      <input type="hidden" name="_method" value="PUT">
+      <div class="form-group">
+        <label for="name" class="form-label">Name:</label>
+        <input type="text" class="form-control" id="name" name="name" value="<%= author.name %>">
+      </div>
+      <div class="form-group">
+        <label for="bio" class="form-label">Bio:</label>
+        <textarea class="form-control" id="bio" name="bio"><%= author.bio %></textarea>
+      </div>
+      <div class="form-group">
+        <label for="birthday" class="form-label">Date of Birth:</label>
+        <input type="date" class="form-control" id="birthday" name="birthday" value="<%= author.birthday %>">
+      </div>
+      <div class="form-group">
+        <label for="country" class="form-label">Country of Origin:</label>
+        <input type="text" class="form-control" id="country" name="country" value="<%= author.country %>">
+      </div>
+      <button type="submit" class="btn btn-primary">Update Author</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

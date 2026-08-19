@@ -6,6 +6,9 @@
     <title><%= title %></title>
 </head>
 <body>
+
+  <button onclick="location.href='/authors'">Back to Authors List</button>
+  
     <div class="container">
       <h1>Author Details</h1>
       <p>Name: <%= author.name %></p>
@@ -13,7 +16,11 @@
       <p>Date of Birth: <%= author.birthday %></p>
       <p>Country of Origin: <%= author.country %></p>
     </div>
+
+    <button onclick="location.href='/authors/<%= author.id %>/edit'">Edit Author</button>
+
     <div class="container">
+      <h2>Books by <%= author.name %></h2>
       <table class="table">
         <thead>
           <tr>
@@ -35,5 +42,9 @@
         </tbody>
       </table>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script></script>
 </body>
 </html>

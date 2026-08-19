@@ -13,6 +13,7 @@ const port = 3000;
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Configurar el motor de vistas EJS
 app.set('views', path.join(__dirname, 'views'));
