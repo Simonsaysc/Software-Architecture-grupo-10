@@ -1,5 +1,7 @@
 const Author = require('../models/authorModel');
 const Book = require('../models/bookModel');
+const Review = require('../models/reviewModel');
+const Sales = require('../models/salesModel');
 
 // Página: lista de autores
 exports.index = async (req, res) => {

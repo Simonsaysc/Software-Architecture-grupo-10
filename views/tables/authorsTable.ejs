@@ -1,51 +1,113 @@
 <div class="container mt-4">
   <h2>Authors Table</h2>
-  <table class="table table-striped">
-    <thead>
+  
+  <table class="table table-striped table-hover mt-3" id="authorsTable">
+    <thead class="table-dark">
       <tr>
-        <th><button class="btn btn-link p-0" onclick="sortByAuthorName()">Author</button></th>
-        <th><button class="btn btn-link p-0" onclick="sortByBooksCount()">Number of Books</button></th>
-        <th><button class="btn btn-link p-0" onclick="sortByAverageScore()">Average Score</button></th>
-        <th><button class="btn btn-link p-0" onclick="sortByTotalSales()">Total Sales</button></th>
+        <th onclick="sortTable(0, 'string')" style="cursor: pointer; user-select: none;">
+          Author <span id="sort-icon-0">↕</span>
+        </th>
+        <th onclick="sortTable(1, 'number')" style="cursor: pointer; user-select: none;">
+          Number of Books <span id="sort-icon-1">↕</span>
+        </th>
+        <th onclick="sortTable(2, 'number')" style="cursor: pointer; user-select: none;">
+          Average Score <span id="sort-icon-2">↕</span>
+        </th>
+        <th onclick="sortTable(3, 'number')" style="cursor: pointer; user-select: none;">
+          Total Sales <span id="sort-icon-3">↕</span>
+        </th>
+      </tr>
+      <tr class="table-secondary">
+        <th>
+          <input type="text" id="filter-author" class="form-control form-control-sm" placeholder="Buscar autor..." oninput="filterTable()">
+        </th>
+        <th>
+          <input type="number" id="filter-books" class="form-control form-control-sm" placeholder="Mín. libros..." oninput="filterTable()">
+        </th>
+        <th>
+          <input type="number" step="0.1" id="filter-score" class="form-control form-control-sm" placeholder="Mín. puntaje..." oninput="filterTable()">
+        </th>
+        <th>
+          <input type="number" id="filter-sales" class="form-control form-control-sm" placeholder="Mín. ventas..." oninput="filterTable()">
+        </th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="authorsTbody">
       <% authors.forEach(author => { %>
         <tr>
           <td><%= author.name %></td>
           <td><%= author.booksCount %></td>
-          <td><%= author.averageScore.toFixed(2) %></td>
+          <td><%= Number(author.averageScore).toFixed(2) %></td>
           <td><%= author.totalSales %></td>
         </tr>
       <% }) %>
+    </tbody>
+  </table>
 </div>
 
 <script>
-  function sortByBooksCount() {
-    const table = document.querySelector('table');
-    const rows = Array.from(table.rows).slice(1); // Exclude header row
-    rows.sort((a, b) => parseInt(b.cells[1].textContent) - parseInt(a.cells[1].textContent));
-    rows.forEach(row => table.appendChild(row));
+  let currentSortCol = -1;
+  let currentSortDir = 'asc';
+
+  function filterTable() {
+    const authorFilter = document.getElementById('filter-author').value.toLowerCase().trim();
+    const booksFilter = parseFloat(document.getElementById('filter-books').value);
+    const scoreFilter = parseFloat(document.getElementById('filter-score').value);
+    const salesFilter = parseFloat(document.getElementById('filter-sales').value);
+
+    const rows = document.querySelectorAll('#authorsTbody tr');
+
+    rows.forEach(row => {
+      const name = row.cells[0].textContent.toLowerCase();
+      const booksCount = parseFloat(row.cells[1].textContent) || 0;
+      const averageScore = parseFloat(row.cells[2].textContent) || 0;
+      const totalSales = parseFloat(row.cells[3].textContent) || 0;
+
+      const matchAuthor = !authorFilter || name.includes(authorFilter);
+      const matchBooks = isNaN(booksFilter) || booksCount >= booksFilter;
+      const matchScore = isNaN(scoreFilter) || averageScore >= scoreFilter;
+      const matchSales = isNaN(salesFilter) || totalSales >= salesFilter;
+
+      if (matchAuthor && matchBooks && matchScore && matchSales) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
   }
 
-  function sortByAuthorName() {
-    const table = document.querySelector('table');
-    const rows = Array.from(table.rows).slice(1); // Exclude header row
-    rows.sort((a, b) => a.cells[0].textContent.localeCompare(b.cells[0].textContent));
-    rows.forEach(row => table.appendChild(row));
-  }
+  function sortTable(colIndex, type) {
+    const tbody = document.getElementById('authorsTbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
 
-  function sortByAverageScore() {
-    const table = document.querySelector('table');
-    const rows = Array.from(table.rows).slice(1); // Exclude header row
-    rows.sort((a, b) => parseFloat(b.cells[2].textContent) - parseFloat(a.cells[2].textContent));
-    rows.forEach(row => table.appendChild(row));
-  }
+    if (currentSortCol === colIndex) {
+      currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      currentSortCol = colIndex;
+      currentSortDir = 'asc';
+    }
 
-  function sortByTotalSales() {
-    const table = document.querySelector('table');
-    const rows = Array.from(table.rows).slice(1); // Exclude header row
-    rows.sort((a, b) => parseInt(b.cells[3].textContent) - parseInt(a.cells[3].textContent));
-    rows.forEach(row => table.appendChild(row));
+    // Reset icon indicators
+    for (let i = 0; i < 4; i++) {
+      document.getElementById(`sort-icon-${i}`).textContent = '↕';
+    }
+    document.getElementById(`sort-icon-${colIndex}`).textContent = currentSortDir === 'asc' ? '▲' : '▼';
+
+    rows.sort((a, b) => {
+      let valA = a.cells[colIndex].textContent.trim();
+      let valB = b.cells[colIndex].textContent.trim();
+
+      if (type === 'number') {
+        valA = parseFloat(valA) || 0;
+        valB = parseFloat(valB) || 0;
+        return currentSortDir === 'asc' ? valA - valB : valB - valA;
+      } else {
+        return currentSortDir === 'asc' 
+          ? valA.localeCompare(valB) 
+          : valB.localeCompare(valA);
+      }
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
   }
 </script>
