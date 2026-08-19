@@ -1,0 +1,28 @@
+<div class="container mt-4">
+  <h2>Editar Venta</h2>
+
+  <form action="/sales/<%= sale.id %>/edit" method="POST">
+    <div class="mb-3">
+      <label for="BookId" class="form-label">Libro</label>
+      <select class="form-select" id="BookId" name="BookId" required>
+        <option value="">-- Seleccionar libro --</option>
+        <% books.forEach(book => { %>
+          <option value="<%= book.id %>" <%= sale.BookId === book.id ? 'selected' : '' %>><%= book.title %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="quantity" class="form-label">Cantidad</label>
+      <input type="number" class="form-control" id="quantity" name="quantity" value="<%= sale.quantity %>" min="1" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="year" class="form-label">Año</label>
+      <input type="number" class="form-control" id="year" name="year" value="<%= sale.year %>" min="1900" max="2100" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a href="/sales" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>

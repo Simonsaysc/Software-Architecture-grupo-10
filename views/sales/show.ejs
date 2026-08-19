@@ -1,0 +1,13 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-body">
+      <h2 class="card-title">Detalle de Venta</h2>
+      <p><strong>Libro:</strong> <a href="/books/<%= sale.BookId %>"><%= sale.Book ? sale.Book.title : 'N/A' %></a></p>
+      <p><strong>Cantidad:</strong> <%= sale.quantity %></p>
+      <p><strong>Año:</strong> <%= sale.year %></p>
+
+      <a href="/sales/<%= sale.id %>/edit" class="btn btn-warning">Editar</a>
+      <a href="/sales" class="btn btn-secondary">← Volver</a>
+    </div>
+  </div>
+</div>

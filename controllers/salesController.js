@@ -1,55 +1,78 @@
 const Sales = require('../models/salesModel');
+const Book = require('../models/bookModel');
 
-// GET /sales
-exports.getAllSales = async (req, res) => {
+// Página: lista de ventas
+exports.index = async (req, res) => {
   try {
-    const sales = await Sales.findAll();
-    res.json(sales);
+    const sales = await Sales.findAll({ include: Book });
+    res.render('sales/index', { title: 'Ventas', sales });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// GET /sales/:id
-exports.getSaleById = async (req, res) => {
+// Página: detalle de una venta
+exports.show = async (req, res) => {
   try {
-    const sale = await Sales.findByPk(req.params.id);
-    if (!sale) return res.status(404).json({ error: 'Sale not found' });
-    res.json(sale);
+    const sale = await Sales.findByPk(req.params.id, { include: Book });
+    if (!sale) return res.status(404).send('Venta no encontrada');
+    res.render('sales/show', { title: 'Detalle de Venta', sale });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// POST /sales
-exports.createSale = async (req, res) => {
+// Página: formulario nueva venta
+exports.newForm = async (req, res) => {
   try {
-    const sale = await Sales.create(req.body);
-    res.status(201).json(sale);
+    const books = await Book.findAll();
+    res.render('sales/new', { title: 'Registrar Venta', books });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Acción: crear venta (recibe formulario)
+exports.create = async (req, res) => {
+  try {
+    await Sales.create(req.body);
+    res.redirect('/sales');
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-// PUT /sales/:id
-exports.updateSale = async (req, res) => {
+// Página: formulario editar venta
+exports.editForm = async (req, res) => {
   try {
     const sale = await Sales.findByPk(req.params.id);
-    if (!sale) return res.status(404).json({ error: 'Sale not found' });
+    if (!sale) return res.status(404).send('Venta no encontrada');
+    const books = await Book.findAll();
+    res.render('sales/edit', { title: 'Editar Venta', sale, books });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Acción: actualizar venta (recibe formulario)
+exports.update = async (req, res) => {
+  try {
+    const sale = await Sales.findByPk(req.params.id);
+    if (!sale) return res.status(404).send('Venta no encontrada');
     await sale.update(req.body);
-    res.json(sale);
+    res.redirect('/sales/' + sale.id);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-// DELETE /sales/:id
-exports.deleteSale = async (req, res) => {
+// Acción: eliminar venta
+exports.destroy = async (req, res) => {
   try {
     const sale = await Sales.findByPk(req.params.id);
-    if (!sale) return res.status(404).json({ error: 'Sale not found' });
+    if (!sale) return res.status(404).send('Venta no encontrada');
     await sale.destroy();
-    res.json({ message: 'Sale deleted successfully' });
+    res.redirect('/sales');
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
