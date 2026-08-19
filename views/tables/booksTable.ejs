@@ -1,0 +1,165 @@
+<div class="container mt-4">
+  <h2>Top 10 Libros Mejor Valorados</h2>
+  
+  <table class="table table-striped table-hover mt-3" id="booksTable">
+    <thead class="table-dark">
+      <tr>
+        <th onclick="sortTable(0, 'number')" style="cursor: pointer; user-select: none;"># <span id="sort-icon-0">↕</span></th>
+        <th onclick="sortTable(1, 'string')" style="cursor: pointer; user-select: none;">Título <span id="sort-icon-1">↕</span></th>
+        <th onclick="sortTable(2, 'string')" style="cursor: pointer; user-select: none;">Autor <span id="sort-icon-2">↕</span></th>
+        <th onclick="sortTable(3, 'number')" style="cursor: pointer; user-select: none;">Puntaje Promedio <span id="sort-icon-3">↕</span></th>
+        <th onclick="sortTable(4, 'number')" style="cursor: pointer; user-select: none;">Ventas Totales <span id="sort-icon-4">↕</span></th>
+        <th>Mejor Reseña</th>
+        <th>Peor Reseña</th>
+      </tr>
+      <tr class="table-secondary">
+        <th></th>
+        <th>
+          <input type="text" id="filter-title" class="form-control form-control-sm" placeholder="Buscar título..." oninput="filterTable()">
+        </th>
+        <th>
+          <input type="text" id="filter-author" class="form-control form-control-sm" placeholder="Buscar autor..." oninput="filterTable()">
+        </th>
+        <th>
+          <input type="number" step="0.1" id="filter-score" class="form-control form-control-sm" placeholder="Mín. puntaje..." oninput="filterTable()">
+        </th>
+        <th>
+          <input type="number" id="filter-sales" class="form-control form-control-sm" placeholder="Mín. ventas..." oninput="filterTable()">
+        </th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="booksTbody">
+      <% if (books.length === 0) { %>
+        <tr>
+          <td colspan="7" class="text-center">No hay libros ni reseñas registradas.</td>
+        </tr>
+      <% } else { %>
+        <% books.forEach((book, index) => { %>
+          <tr>
+            <td><strong><%= index + 1 %></strong></td>
+            <td><a href="/books/<%= book.id %>"><%= book.title %></a></td>
+            <td><%= book.authorName %></td>
+            <td>
+              <span class="badge bg-warning text-dark fs-6">
+                ⭐ <%= Number(book.averageScore).toFixed(2) %> / 5
+              </span>
+              <small class="text-muted d-block">(<%= book.reviewsCount %> reseña<%= book.reviewsCount === 1 ? '' : 's' %>)</small>
+            </td>
+            <td><%= book.totalSales %></td>
+            <td>
+              <% if (book.bestReview) { %>
+                <div class="border rounded p-2 bg-light">
+                  <strong><%= book.bestReview.reviewer_name %></strong> 
+                  <span class="text-warning">⭐ <%= book.bestReview.rating %>/5</span>
+                  <p class="mb-0 small text-truncate" style="max-width: 200px;" title="<%= book.bestReview.comment %>">
+                    "<%= book.bestReview.comment %>"
+                  </p>
+                </div>
+              <% } else { %>
+                <span class="text-muted">Sin reseñas</span>
+              <% } %>
+            </td>
+            <td>
+              <% if (book.worstReview) { %>
+                <div class="border rounded p-2 bg-light">
+                  <strong><%= book.worstReview.reviewer_name %></strong> 
+                  <span class="text-warning">⭐ <%= book.worstReview.rating %>/5</span>
+                  <p class="mb-0 small text-truncate" style="max-width: 200px;" title="<%= book.worstReview.comment %>">
+                    "<%= book.worstReview.comment %>"
+                  </p>
+                </div>
+              <% } else { %>
+                <span class="text-muted">Sin reseñas</span>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  let currentSortCol = -1;
+  let currentSortDir = 'asc';
+
+  function filterTable() {
+    const titleFilter = document.getElementById('filter-title').value.toLowerCase().trim();
+    const authorFilter = document.getElementById('filter-author').value.toLowerCase().trim();
+    const scoreFilter = parseFloat(document.getElementById('filter-score').value);
+    const salesFilter = parseFloat(document.getElementById('filter-sales').value);
+
+    const rows = document.querySelectorAll('#booksTbody tr');
+
+    rows.forEach(row => {
+      if (row.cells.length < 5) return;
+      const title = row.cells[1].textContent.toLowerCase();
+      const author = row.cells[2].textContent.toLowerCase();
+      
+      // Extract numeric score from cell
+      const scoreMatch = row.cells[3].textContent.match(/⭐\s*([\d.]+)/);
+      const score = scoreMatch ? parseFloat(scoreMatch[1]) : 0;
+      
+      const sales = parseFloat(row.cells[4].textContent) || 0;
+
+      const matchTitle = !titleFilter || title.includes(titleFilter);
+      const matchAuthor = !authorFilter || author.includes(authorFilter);
+      const matchScore = isNaN(scoreFilter) || score >= scoreFilter;
+      const matchSales = isNaN(salesFilter) || sales >= salesFilter;
+
+      if (matchTitle && matchAuthor && matchScore && matchSales) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  function sortTable(colIndex, type) {
+    const tbody = document.getElementById('booksTbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    if (currentSortCol === colIndex) {
+      currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      currentSortCol = colIndex;
+      currentSortDir = 'asc';
+    }
+
+    for (let i = 0; i <= 4; i++) {
+      const icon = document.getElementById(`sort-icon-${i}`);
+      if (icon) icon.textContent = '↕';
+    }
+    const targetIcon = document.getElementById(`sort-icon-${colIndex}`);
+    if (targetIcon) targetIcon.textContent = currentSortDir === 'asc' ? '▲' : '▼';
+
+    rows.sort((a, b) => {
+      if (a.cells.length < 5 || b.cells.length < 5) return 0;
+      let valA = a.cells[colIndex].textContent.trim();
+      let valB = b.cells[colIndex].textContent.trim();
+
+      if (colIndex === 3) {
+        // Extract numeric score
+        const matchA = valA.match(/⭐\s*([\d.]+)/);
+        const matchB = valB.match(/⭐\s*([\d.]+)/);
+        valA = matchA ? parseFloat(matchA[1]) : 0;
+        valB = matchB ? parseFloat(matchB[1]) : 0;
+        return currentSortDir === 'asc' ? valA - valB : valB - valA;
+      }
+
+      if (type === 'number') {
+        valA = parseFloat(valA) || 0;
+        valB = parseFloat(valB) || 0;
+        return currentSortDir === 'asc' ? valA - valB : valB - valA;
+      } else {
+        return currentSortDir === 'asc' 
+          ? valA.localeCompare(valB) 
+          : valB.localeCompare(valA);
+      }
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+  }
+</script>

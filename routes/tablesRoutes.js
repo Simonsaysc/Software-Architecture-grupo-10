@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const tablesController = require('../controllers/tablesController');
 
-// Vistas
-router.get('/authorsTable', tablesController.authorsTable); // tabla de autores
+// Vistas de tablas
+router.get('/authorsTable', tablesController.authorsTable); // tabla de autores con estadísticas
+router.get('/booksTable', tablesController.booksTable);     // tabla top 10 libros mejor valorados
 
 module.exports = router;
