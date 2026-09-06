@@ -2,54 +2,71 @@ const Author = require('../models/authorModel');
 const Book = require('../models/bookModel');
 const Review = require('../models/reviewModel');
 const Sales = require('../models/salesModel');
+const cacheService = require('../services/cacheService');
 
 // Página: Tabla de autores con estadísticas
 exports.authorsTable = async (req, res) => {
   try {
+    // 1. Intentar obtener de la caché
+    const cachedAuthors = await cacheService.get(cacheService.KEYS.AUTHORS_TABLE);
+    if (cachedAuthors) {
+      return res.render('tables/authorsTable', {
+        title: 'Authors Table',
+        authors: cachedAuthors
+      });
+    }
+
+    // 2. Cache Miss: Consultar base de datos
     const authors = await Author.findAll({
       include: [
         { model: Book, include: [Review, Sales] }
       ]
     });
+
+    const processedAuthors = authors.map(author => {
+      const data = author.toJSON();
+
+      // Número de libros
+      const booksCount = data.Books ? data.Books.length : 0;
+
+      // Puntaje promedio de reseñas
+      let allRatings = [];
+      if (data.Books) {
+        data.Books.forEach(book => {
+          if (book.Reviews) {
+            book.Reviews.forEach(review => allRatings.push(review.rating));
+          }
+        });
+      }
+      const averageScore = allRatings.length > 0
+        ? allRatings.reduce((sum, r) => sum + r, 0) / allRatings.length
+        : 0;
+
+      // Ventas totales
+      let totalSales = 0;
+      if (data.Books) {
+        data.Books.forEach(book => {
+          if (book.Sales) {
+            book.Sales.forEach(sale => totalSales += sale.quantity);
+          }
+        });
+      }
+
+      return {
+        id: data.id,
+        name: data.name,
+        booksCount,
+        averageScore,
+        totalSales
+      };
+    });
+
+    // 3. Guardar en la caché
+    await cacheService.set(cacheService.KEYS.AUTHORS_TABLE, processedAuthors);
+
     res.render('tables/authorsTable', {
       title: 'Authors Table',
-      authors: authors.map(author => {
-        const data = author.toJSON();
-
-        // Número de libros
-        const booksCount = data.Books ? data.Books.length : 0;
-
-        // Puntaje promedio de reseñas
-        let allRatings = [];
-        if (data.Books) {
-          data.Books.forEach(book => {
-            if (book.Reviews) {
-              book.Reviews.forEach(review => allRatings.push(review.rating));
-            }
-          });
-        }
-        const averageScore = allRatings.length > 0
-          ? allRatings.reduce((sum, r) => sum + r, 0) / allRatings.length
-          : 0;
-
-        // Ventas totales
-        let totalSales = 0;
-        if (data.Books) {
-          data.Books.forEach(book => {
-            if (book.Sales) {
-              book.Sales.forEach(sale => totalSales += sale.quantity);
-            }
-          });
-        }
-
-        return {
-          id: data.id,
-          name: data.name,
-          booksCount,
-          averageScore,
-          totalSales
-        };
-      })
+      authors: processedAuthors
     });
   } catch (error) {
     console.error(error);
@@ -60,6 +77,16 @@ exports.authorsTable = async (req, res) => {
 // Página: Top 10 Libros mejor valorados con mejor y peor reseña
 exports.booksTable = async (req, res) => {
   try {
+    // 1. Intentar obtener de la caché
+    const cachedTopBooks = await cacheService.get(cacheService.KEYS.TOP_RATED_BOOKS);
+    if (cachedTopBooks) {
+      return res.render('tables/booksTable', {
+        title: 'Top 10 Libros Mejor Valorados',
+        books: cachedTopBooks
+      });
+    }
+
+    // 2. Cache Miss: Consultar base de datos
     const books = await Book.findAll({
       include: [Author, Review, Sales]
     });
@@ -100,6 +127,9 @@ exports.booksTable = async (req, res) => {
       .sort((a, b) => b.averageScore - a.averageScore)
       .slice(0, 10);
 
+    // 3. Guardar en la caché
+    await cacheService.set(cacheService.KEYS.TOP_RATED_BOOKS, top10Books);
+
     res.render('tables/booksTable', {
       title: 'Top 10 Libros Mejor Valorados',
       books: top10Books
@@ -113,6 +143,16 @@ exports.booksTable = async (req, res) => {
 // Página: Top 50 Libros más vendidos con ventas de autor y top 5 del año de publicación
 exports.topSalesTable = async (req, res) => {
   try {
+    // 1. Intentar obtener de la caché
+    const cachedTopSales = await cacheService.get(cacheService.KEYS.TOP_SALES_TABLE);
+    if (cachedTopSales) {
+      return res.render('tables/topSalesTable', {
+        title: 'Top 50 Libros Más Vendidos',
+        books: cachedTopSales
+      });
+    }
+
+    // 2. Cache Miss: Consultar base de datos
     const allBooks = await Book.findAll({
       include: [Author, Sales]
     });
@@ -200,6 +240,9 @@ exports.topSalesTable = async (req, res) => {
         ...book,
         isTop5InReleaseYear: top5BookIds.has(book.id)
       }));
+
+    // 3. Guardar en la caché
+    await cacheService.set(cacheService.KEYS.TOP_SALES_TABLE, top50SellingBooks);
 
     res.render('tables/topSalesTable', {
       title: 'Top 50 Libros Más Vendidos',

@@ -1,5 +1,6 @@
 const Review = require('../models/reviewModel');
 const Book = require('../models/bookModel');
+const cacheService = require('../services/cacheService');
 
 // Página: lista de todas las reseñas
 exports.index = async (req, res) => {
@@ -40,6 +41,10 @@ exports.newForm = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     await Review.create({ ...req.body, BookId: req.params.bookId });
+
+    // Purgar la caché dependiente de las reseñas (puntaje de libro, top 10 y autores)
+    await cacheService.invalidateOnReviewChange(req.params.bookId);
+
     res.redirect('/books/' + req.params.bookId);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -68,6 +73,10 @@ exports.update = async (req, res) => {
     });
     if (!review) return res.status(404).send('Reseña no encontrada');
     await review.update(req.body);
+
+    // Purgar la caché dependiente de las reseñas
+    await cacheService.invalidateOnReviewChange(req.params.bookId);
+
     res.redirect('/books/' + req.params.bookId);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -82,6 +91,10 @@ exports.destroy = async (req, res) => {
     });
     if (!review) return res.status(404).send('Reseña no encontrada');
     await review.destroy();
+
+    // Purgar la caché dependiente de las reseñas
+    await cacheService.invalidateOnReviewChange(req.params.bookId);
+
     res.redirect('/books/' + req.params.bookId);
   } catch (error) {
     res.status(500).json({ error: error.message });

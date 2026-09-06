@@ -4,6 +4,7 @@ const Author = require('../models/authorModel');
 const Book = require('../models/bookModel');
 const Review = require('../models/reviewModel');
 const Sales = require('../models/salesModel');
+const cacheService = require('../services/cacheService');
 
 const NUM_AUTHORS = 50;
 const NUM_BOOKS = 300;
@@ -83,6 +84,9 @@ async function seed() {
 
     if ((i + 1) % 50 === 0) console.log(`  ${i + 1}/${NUM_BOOKS} books done`);
   }
+
+  // Flush all stale cache entries after repopulating database
+  await cacheService.flush();
 
   console.log('Done seeding!');
   await sequelize.close();

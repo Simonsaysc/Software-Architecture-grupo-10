@@ -2,6 +2,7 @@ const Author = require('../models/authorModel');
 const Book = require('../models/bookModel');
 const Review = require('../models/reviewModel');
 const Sales = require('../models/salesModel');
+const cacheService = require('../services/cacheService');
 
 // Página: lista de autores
 exports.index = async (req, res) => {
@@ -35,6 +36,10 @@ exports.newForm = (req, res) => {
 exports.create = async (req, res) => {
   try {
     await Author.create(req.body);
+
+    // Purgar la caché dependiente de los autores
+    await cacheService.invalidateOnAuthorChange();
+
     res.redirect('/authors');
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -58,6 +63,10 @@ exports.update = async (req, res) => {
     const author = await Author.findByPk(req.params.id);
     if (!author) return res.status(404).send('Autor no encontrado');
     await author.update(req.body);
+
+    // Purgar la caché dependiente de los autores
+    await cacheService.invalidateOnAuthorChange();
+
     res.redirect('/authors/' + author.id);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -70,6 +79,10 @@ exports.destroy = async (req, res) => {
     const author = await Author.findByPk(req.params.id);
     if (!author) return res.status(404).send('Autor no encontrado');
     await author.destroy();
+
+    // Purgar la caché dependiente de los autores
+    await cacheService.invalidateOnAuthorChange();
+
     res.redirect('/authors');
   } catch (error) {
     res.status(500).json({ error: error.message });

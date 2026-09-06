@@ -17,6 +17,7 @@
     "express": "^5.2.1",
     "express-ejs-layouts": "^2.5.1",
     "express-validator": "^7.0.1",
+    "ioredis": "^6.0.0",
     "pg": "^8.23.0",
     "sequelize": "^6.37.8"
   },

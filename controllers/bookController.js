@@ -2,6 +2,24 @@ const { Op } = require('sequelize');
 const Book = require('../models/bookModel');
 const Author = require('../models/authorModel');
 const Review = require('../models/reviewModel');
+const cacheService = require('../services/cacheService');
+
+// Obtener el puntaje promedio de un libro (con caché + fallback)
+exports.getAverageScore = async (bookId) => {
+  const cacheKey = cacheService.KEYS.BOOK_AVG_SCORE(bookId);
+  const cachedScore = await cacheService.get(cacheKey);
+  if (cachedScore !== null) {
+    return cachedScore;
+  }
+
+  const reviews = await Review.findAll({ where: { BookId: bookId } });
+  const avgScore = reviews.length > 0
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length)
+    : 0;
+
+  await cacheService.set(cacheKey, avgScore);
+  return avgScore;
+};
 
 // Página: lista de libros
 exports.index = async (req, res) => {
@@ -57,13 +75,17 @@ exports.search = async (req, res) => {
   }
 };
 
-// Página: detalle de un libro
+// Página: detalle de un libro (incluye puntaje promedio cacheados)
 exports.show = async (req, res) => {
   try {
     const book = await Book.findByPk(req.params.id, { include: Author });
     if (!book) return res.status(404).send('Libro no encontrado');
     const reviews = await Review.findAll({ where: { BookId: book.id } });
-    res.render('books/show', { title: book.title, book, reviews });
+
+    // Calcular/Obtener puntaje promedio de la caché
+    const averageScore = await exports.getAverageScore(book.id);
+
+    res.render('books/show', { title: book.title, book, reviews, averageScore });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -82,7 +104,11 @@ exports.newForm = async (req, res) => {
 // Acción: crear libro (recibe formulario)
 exports.create = async (req, res) => {
   try {
-    await Book.create(req.body);
+    const book = await Book.create(req.body);
+
+    // Invalidador de caché
+    await cacheService.invalidateOnBookChange(book.id);
+
     res.redirect('/books');
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -107,6 +133,10 @@ exports.update = async (req, res) => {
     const book = await Book.findByPk(req.params.id);
     if (!book) return res.status(404).send('Libro no encontrado');
     await book.update(req.body);
+
+    // Invalidador de caché
+    await cacheService.invalidateOnBookChange(book.id);
+
     res.redirect('/books/' + book.id);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -118,7 +148,12 @@ exports.destroy = async (req, res) => {
   try {
     const book = await Book.findByPk(req.params.id);
     if (!book) return res.status(404).send('Libro no encontrado');
+    const bookId = book.id;
     await book.destroy();
+
+    // Invalidador de caché
+    await cacheService.invalidateOnBookChange(bookId);
+
     res.redirect('/books');
   } catch (error) {
     res.status(500).json({ error: error.message });
