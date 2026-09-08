@@ -22,8 +22,8 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       ENABLE_CACHE: "true"
-      SEARCH_HOST: ${SEARCH_HOST}
-      SEARCH_PORT: ${SEARCH_PORT}
+      SEARCH_HOST: opensearch
+      SEARCH_PORT: 9200
       ENABLE_SEARCH: "true"
       OPENSEARCH_USERNAME: ${OPENSEARCH_USERNAME}
       OPENSEARCH_PASSWORD: ${OPENSEARCH_PASSWORD}
@@ -37,7 +37,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:

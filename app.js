@@ -8,6 +8,8 @@ const authorRoutes = require('./routes/authorRoutes');
 const salesRoutes = require('./routes/salesRoutes');
 const tablesRoutes = require('./routes/tablesRoutes');
 const { body, query, param } = require("express-validator");
+const { startSearchEngine } = require('./services/searchEngineService');
+const { ensureBookIndex } = require('./services/bookSearchService');
 
 const app = express();
 const port = 3000;
@@ -41,7 +43,17 @@ app.use('/sales', salesRoutes);
 app.use('/tables', tablesRoutes);
 
 // Sync database and start server
-sequelize.sync().then(() => {
+sequelize.sync().then(async () => {
+  // Initialize OpenSearch Search Engine asynchronously
+  try {
+    const status = await startSearchEngine();
+    if (status.available) {
+      await ensureBookIndex();
+    }
+  } catch (err) {
+    console.warn('[search] Search engine init warning:', err.message);
+  }
+
   app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
   });

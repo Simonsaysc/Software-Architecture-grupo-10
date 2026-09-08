@@ -1,6 +1,6 @@
 const { indexBook, updateBookIndex, deleteBookIndex } = require('../services/bookSearchService');
 
-const BOOK_FOREIGN_KEY = 'bookId';
+const BOOK_FOREIGN_KEY = 'BookId';
 
 async function getReviewsText(Review, bookId) {
   const reviews = await Review.findAll({ 
@@ -50,7 +50,7 @@ function registerReviewSearchHooks(Review) {
     const bookId = review[BOOK_FOREIGN_KEY];
     try {
       const reviewsText = await getReviewsText(Review, bookId);
-      await updateBookFields(bookId, { reviews: reviewsText });
+      await updateBookIndex(bookId, { reviews: reviewsText });
     } catch (err) {
       console.error(`[search] No se pudo resincronizar reviews del libro ${bookId}: ${err.message}`);
     }

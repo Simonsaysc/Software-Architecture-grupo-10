@@ -3,9 +3,8 @@ require('dotenv').config();
 const Book = require('../models/bookModel');
 const Review = require('../models/reviewModel');
 
-const { startSearchEngine, isSearchEngineAvailable } = require('../services/searchEngineService');
-const { ensureBookIndexExists, indexBook } = require('../services/bookSearchService');
-const { getReviewsText } = require('../models/searchHooks');
+const { startSearchEngine, isSearchEngineAvailable, bulkIndex } = require('../services/searchEngineService');
+const { ensureBookIndexExists } = require('../services/bookSearchService');
 
 async function reindexBooks() {
   await startSearchEngine();
@@ -17,28 +16,33 @@ async function reindexBooks() {
 
   await ensureBookIndexExists();
 
-  const books = await Book.findAll({ raw: true });
+  console.log('Fetching all books and reviews from database...');
+  const books = await Book.findAll({
+    include: [{ model: Review, attributes: ['comment'] }]
+  });
+
   console.log(`Reindexing ${books.length} books...`);
 
-  let done = 0;
-  for (const book of books) {
-    const reviewsText = await getReviewsText(Review, book.id);
-    const ok = await indexBook({ 
-      id: book.id,
-      title: book.title,
-      summary: book.summary,
-      reviews: reviewsText
-    });
-    if (!ok) {
-      console.error(`Failed to index book ${book.id}`);
-    }
-    done++;
-    if (done % 100 === 0) {
-      console.log(`Indexed ${done}/${books.length} books...`);
-    }
+  const documents = books.map(book => {
+    const data = book.toJSON();
+    const reviewsText = (data.Reviews || []).map(r => r.comment).join('\n');
+    return {
+      id: data.id,
+      body: {
+        title: data.title || '',
+        summary: data.summary || '',
+        reviews: reviewsText
+      }
+    };
+  });
+
+  const ok = await bulkIndex('books', documents);
+  if (ok) {
+    console.log(`Reindexing completed successfully. Total books indexed: ${documents.length}`);
+  } else {
+    console.error('Bulk indexing completed with some errors.');
   }
 
-  console.log(`Reindexing completed. Total books indexed: ${done}`);
   process.exit(0);
 }
 

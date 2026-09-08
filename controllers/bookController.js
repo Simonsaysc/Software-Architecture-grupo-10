@@ -72,12 +72,15 @@ exports.search = async (req, res) => {
         }
       }
 
-      const { count, rows: books } = await Book.findAndCountAll({
+      const dbResult = await Book.findAndCountAll({
         where: whereClause,
+        include: [Author],
         limit,
         offset,
         order: [['id', 'DESC']]
       });
+      count = dbResult.count;
+      books = dbResult.rows;
     }
 
     const totalPages = Math.ceil(count / limit) || 1;

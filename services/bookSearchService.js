@@ -60,6 +60,7 @@ async function searchBooks(query, { page = 1, pageSize = 10 } = {}) {
 module.exports = {
   BOOK_INDEX,
   ensureBookIndex,
+  ensureBookIndexExists: ensureBookIndex,
   indexBook,
   updateBookIndex,
   deleteBookIndex,

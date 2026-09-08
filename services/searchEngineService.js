@@ -1,12 +1,13 @@
 const { Client } = require('@opensearch-project/opensearch');
 require('dotenv').config();
 
+const searchProtocol = process.env.SEARCH_PROTOCOL || 'https';
 const searchHost = process.env.SEARCH_HOST || 'localhost';
 const searchPort = parseInt(process.env.SEARCH_PORT) || 9200;
 
 const config = {
   enabled: String(process.env.ENABLE_SEARCH || 'false').toLowerCase() === 'true',
-  node: `http://${searchHost}:${searchPort}`,
+  node: `${searchProtocol}://${searchHost}:${searchPort}`,
   username: process.env.OPENSEARCH_USERNAME,
   password: process.env.OPENSEARCH_PASSWORD,
   rejectUnauthorized: String(process.env.OPENSEARCH_REJECT_UNAUTHORIZED || 'true').toLowerCase() === 'true',
