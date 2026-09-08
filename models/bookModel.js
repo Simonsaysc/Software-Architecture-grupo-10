@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 const Author = require('./authorModel');
+const { registerBookSearchHooks } = require('./searchHooks');
 const Book = sequelize.define('Book', {
   title:  { type: DataTypes.STRING, allowNull: false },
   genre:  { type: DataTypes.STRING },
@@ -9,4 +10,6 @@ const Book = sequelize.define('Book', {
 });
 Author.hasMany(Book, { onDelete: 'CASCADE' });
 Book.belongsTo(Author);
+
+registerBookSearchHooks(Book);
 module.exports = Book;

@@ -12,6 +12,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      opensearch:
+        condition: service_started
     environment:
       DB_HOST: db
       DB_USER: ${DB_USER}
@@ -20,6 +22,12 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       ENABLE_CACHE: "true"
+      SEARCH_HOST: ${SEARCH_HOST}
+      SEARCH_PORT: ${SEARCH_PORT}
+      ENABLE_SEARCH: "true"
+      OPENSEARCH_USERNAME: ${OPENSEARCH_USERNAME}
+      OPENSEARCH_PASSWORD: ${OPENSEARCH_PASSWORD}
+      OPENSEARCH_REJECT_UNAUTHORIZED: "false"
   
   db:
     image: postgres:15-alpine
@@ -43,6 +51,20 @@ services:
     restart: always
     ports:
       - "6380:6379"
+  
+  opensearch:
+    image: opensearchproject/opensearch:2.9.0
+    container_name: opensearch
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - OPENSEARCH_USERNAME=${OPENSEARCH_USERNAME}
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD}
+      - OPENSEARCH_REJECT_UNAUTHORIZED=${OPENSEARCH_REJECT_UNAUTHORIZED}
+    ports:
+      - "9200:9200"
 
 volumes:
   db_data:

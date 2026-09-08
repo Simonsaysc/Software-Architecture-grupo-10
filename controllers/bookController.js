@@ -4,6 +4,12 @@ const Author = require('../models/authorModel');
 const Review = require('../models/reviewModel');
 const cacheService = require('../services/cacheService');
 
+//Search Engine
+const { searchBooks } = require('../services/bookSearchService');
+const { isSearchEngineAvailable } = require('../services/searchEngineService');
+const DEFAULT_PAGE_SIZE = 10;
+const MAX_PAGE_SIZE = 50;
+
 // Obtener el puntaje promedio de un libro (con caché + fallback)
 exports.getAverageScore = async (bookId) => {
   const cacheKey = cacheService.KEYS.BOOK_AVG_SCORE(bookId);
@@ -39,26 +45,40 @@ exports.search = async (req, res) => {
     const limit = 5; // 5 resultados por página
     const offset = (page - 1) * limit;
 
-    let whereClause = {};
+    let books = [];
+    let count = 0;
+    let usedSearchEngine = false;
 
-    if (q) {
-      const words = q.split(/\s+/).filter(w => w.length > 0);
-      if (words.length > 0) {
-        whereClause = {
-          [Op.and]: words.map(word => ({
-            summary: { [Op.iLike]: `%${word}%` }
-          }))
-        };
+    if (isSearchEngineAvailable() && q) {
+      const searchResults = await searchBooks(q, { page, pageSize: limit });
+      if (searchResults !== null) {
+        usedSearchEngine = true;
+        count = searchResults.total;
+        books = searchResults.results;
       }
     }
 
-    const { count, rows: books } = await Book.findAndCountAll({
-      where: whereClause,
-      include: [Author],
-      limit,
-      offset,
-      order: [['id', 'DESC']]
-    });
+    if (!usedSearchEngine) {
+      let whereClause = {};
+
+      if (q) {
+        const words = q.split(/\s+/).filter(w => w.length > 0);
+        if (words.length > 0) {
+          whereClause = {
+            [Op.and]: words.map(word => ({
+              summary: { [Op.iLike]: `%${word}%` }
+            }))
+          };
+        }
+      }
+
+      const { count, rows: books } = await Book.findAndCountAll({
+        where: whereClause,
+        limit,
+        offset,
+        order: [['id', 'DESC']]
+      });
+    }
 
     const totalPages = Math.ceil(count / limit) || 1;
 
