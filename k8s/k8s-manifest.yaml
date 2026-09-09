@@ -6,6 +6,14 @@ metadata:
 data:
   DB_NAME: book_reviews
   DB_HOST: postgres-service
+  REDIS_HOST: redis-service
+  REDIS_PORT: "6379"
+  ENABLE_CACHE: "true"
+  SEARCH_HOST: opensearch-service
+  SEARCH_PORT: "9200"
+  ENABLE_SEARCH: "true"
+  SEARCH_PROTOCOL: "https"
+  OPENSEARCH_REJECT_UNAUTHORIZED: "false"
 ---
 # 2. Secret for sensitive credentials
 apiVersion: v1
@@ -17,6 +25,8 @@ stringData:
   DB_USER: postgres
   DB_PASSWORD: postgrespassword
   POSTGRES_PASSWORD: postgrespassword
+  OPENSEARCH_USERNAME: admin
+  OPENSEARCH_PASSWORD: admin
 ---
 # 3. PersistentVolumeClaim for PostgreSQL storage
 apiVersion: v1
@@ -89,7 +99,115 @@ spec:
     - port: 5432
       targetPort: 5432
 ---
-# 6. Web App Deployment
+# 6. Redis Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+---
+# 7. Redis ClusterIP Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+---
+# 8. OpenSearch Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch-deployment
+  labels:
+    app: opensearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opensearch
+  template:
+    metadata:
+      labels:
+        app: opensearch
+    spec:
+      containers:
+        - name: opensearch
+          image: opensearchproject/opensearch:2.9.0
+          ports:
+            - containerPort: 9200
+          env:
+            - name: discovery.type
+              value: "single-node"
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: OPENSEARCH_JAVA_OPTS
+              value: "-Xms512m -Xmx512m"
+            - name: OPENSEARCH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: OPENSEARCH_USERNAME
+            - name: OPENSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: OPENSEARCH_PASSWORD
+            - name: OPENSEARCH_REJECT_UNAUTHORIZED
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: OPENSEARCH_REJECT_UNAUTHORIZED
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+---
+# 9. OpenSearch ClusterIP Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-service
+spec:
+  type: ClusterIP
+  selector:
+    app: opensearch
+  ports:
+    - port: 9200
+      targetPort: 9200
+---
+# 10. Web App Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -133,8 +251,58 @@ spec:
                 secretKeyRef:
                   name: db-secret
                   key: DB_PASSWORD
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: REDIS_PORT
+            - name: ENABLE_CACHE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ENABLE_CACHE
+            - name: SEARCH_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SEARCH_HOST
+            - name: SEARCH_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SEARCH_PORT
+            - name: ENABLE_SEARCH
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ENABLE_SEARCH
+            - name: SEARCH_PROTOCOL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SEARCH_PROTOCOL
+            - name: OPENSEARCH_REJECT_UNAUTHORIZED
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: OPENSEARCH_REJECT_UNAUTHORIZED
+            - name: OPENSEARCH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: OPENSEARCH_USERNAME
+            - name: OPENSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: OPENSEARCH_PASSWORD
 ---
-# 7. Web App NodePort Service (Exposes App outside cluster)
+# 11. Web App NodePort Service (Exposes App outside cluster)
 apiVersion: v1
 kind: Service
 metadata:

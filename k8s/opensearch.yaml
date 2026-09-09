@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch-deployment
+  labels:
+    app: opensearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opensearch
+  template:
+    metadata:
+      labels:
+        app: opensearch
+    spec:
+      containers:
+        - name: opensearch
+          image: opensearchproject/opensearch:2.9.0
+          ports:
+            - containerPort: 9200
+          env:
+            - name: discovery.type
+              value: "single-node"
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: OPENSEARCH_JAVA_OPTS
+              value: "-Xms512m -Xmx512m"
+            - name: OPENSEARCH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: OPENSEARCH_USERNAME
+            - name: OPENSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: OPENSEARCH_PASSWORD
+            - name: OPENSEARCH_REJECT_UNAUTHORIZED
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: OPENSEARCH_REJECT_UNAUTHORIZED
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-service
+spec:
+  type: ClusterIP
+  selector:
+    app: opensearch
+  ports:
+    - port: 9200
+      targetPort: 9200

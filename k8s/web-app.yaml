@@ -21,6 +21,7 @@ spec:
           ports:
             - containerPort: 3000
           env:
+            # Database Configuration
             - name: DB_NAME
               valueFrom:
                 configMapKeyRef:
@@ -41,6 +42,58 @@ spec:
                 secretKeyRef:
                   name: db-secret
                   key: DB_PASSWORD
+            # Redis Cache Configuration
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: REDIS_PORT
+            - name: ENABLE_CACHE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ENABLE_CACHE
+            # OpenSearch Configuration
+            - name: SEARCH_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SEARCH_HOST
+            - name: SEARCH_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SEARCH_PORT
+            - name: ENABLE_SEARCH
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ENABLE_SEARCH
+            - name: SEARCH_PROTOCOL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SEARCH_PROTOCOL
+            - name: OPENSEARCH_REJECT_UNAUTHORIZED
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: OPENSEARCH_REJECT_UNAUTHORIZED
+            - name: OPENSEARCH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: OPENSEARCH_USERNAME
+            - name: OPENSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: OPENSEARCH_PASSWORD
 ---
 apiVersion: v1
 kind: Service
