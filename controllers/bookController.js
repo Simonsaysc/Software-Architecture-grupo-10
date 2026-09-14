@@ -47,6 +47,7 @@ exports.search = async (req, res) => {
 
     let books = [];
     let count = 0;
+    let bookids = [];
     let usedSearchEngine = false;
 
     if (isSearchEngineAvailable() && q) {
@@ -55,6 +56,7 @@ exports.search = async (req, res) => {
         usedSearchEngine = true;
         count = searchResults.total;
         books = searchResults.results;
+        bookids = books.map(book => book.id);
       }
     }
 
@@ -81,6 +83,16 @@ exports.search = async (req, res) => {
       });
       count = dbResult.count;
       books = dbResult.rows;
+    } else {
+      const dbBooks = await Book.findAndCountAll({
+        where: { id: bookids.map(Number) },
+        include: [Author],
+        limit,
+        offset,
+        order: [['id', 'DESC']]
+      });
+      count = dbBooks.count;
+      books = dbBooks.rows;
     }
 
     const totalPages = Math.ceil(count / limit) || 1;
