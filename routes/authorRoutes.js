@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authorController = require('../controllers/authorController');
+const { uploadAuthorImage } = require('../services/uploadService');
 
 // Vistas
 router.get('/',          authorController.index);       // lista de autores
@@ -9,8 +10,8 @@ router.get('/:id',       authorController.show);        // detalle de un autor
 router.get('/:id/edit',  authorController.editForm);    // formulario editar
 
 // Acciones de formulario (POST)
-router.post('/',             authorController.create);   // crear
-router.post('/:id/edit',     authorController.update);   // actualizar
-router.post('/:id/delete',   authorController.destroy);  // eliminar
+router.post('/',           uploadAuthorImage.single('image'), authorController.create);   // crear
+router.post('/:id/edit',   uploadAuthorImage.single('image'), authorController.update);   // actualizar
+router.post('/:id/delete', authorController.destroy);                                      // eliminar
 
 module.exports = router;

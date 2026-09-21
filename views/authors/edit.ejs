@@ -1,7 +1,7 @@
 <div class="container mt-4">
   <h2>Editar Autor</h2>
 
-  <form action="/authors/<%= author.id %>/edit" method="POST">
+  <form action="/authors/<%= author.id %>/edit" method="POST" enctype="multipart/form-data">
     <div class="mb-3">
       <label for="name" class="form-label">Nombre</label>
       <input type="text" class="form-control" id="name" name="name" value="<%= author.name %>" required>
@@ -15,6 +15,17 @@
     <div class="mb-3">
       <label for="birthdate" class="form-label">Fecha de nacimiento</label>
       <input type="date" class="form-control" id="birthdate" name="birthdate" value="<%= author.birthdate || '' %>">
+    </div>
+
+    <div class="mb-3">
+      <label for="image" class="form-label">Foto del Autor (Imagen)</label>
+      <% if (author.image) { %>
+        <div class="mb-2">
+          <img src="<%= author.image %>" alt="Foto actual" class="img-thumbnail rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+        </div>
+      <% } %>
+      <input type="file" class="form-control" id="image" name="image" accept="image/*">
+      <small class="text-muted">Deja este campo vacío para mantener la foto actual.</small>
     </div>
 
     <div class="mb-3">

@@ -1,13 +1,22 @@
 <div class="container mt-4">
   <div class="card">
-    <div class="card-body">
-      <h2 class="card-title"><%= author.name %></h2>
-      <p><strong>País:</strong> <%= author.country %></p>
-      <p><strong>Fecha de nacimiento:</strong> <%= author.birthdate || 'N/A' %></p>
-      <p><strong>Biografía:</strong> <%= author.bio || 'Sin biografía' %></p>
+    <div class="row g-0 align-items-center">
+      <% if (author.image) { %>
+        <div class="col-md-3 text-center p-3">
+          <img src="<%= author.image %>" alt="<%= author.name %>" class="img-fluid rounded-circle shadow-sm" style="width: 180px; height: 180px; object-fit: cover;">
+        </div>
+      <% } %>
+      <div class="<%= author.image ? 'col-md-9' : 'col-md-12' %>">
+        <div class="card-body">
+          <h2 class="card-title"><%= author.name %></h2>
+          <p><strong>País:</strong> <%= author.country %></p>
+          <p><strong>Fecha de nacimiento:</strong> <%= author.birthdate || 'N/A' %></p>
+          <p><strong>Biografía:</strong> <%= author.bio || 'Sin biografía' %></p>
 
-      <a href="/authors/<%= author.id %>/edit" class="btn btn-warning">Editar</a>
-      <a href="/authors" class="btn btn-secondary">← Volver</a>
+          <a href="/authors/<%= author.id %>/edit" class="btn btn-warning">Editar</a>
+          <a href="/authors" class="btn btn-secondary">← Volver</a>
+        </div>
+      </div>
     </div>
   </div>
 

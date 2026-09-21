@@ -139,7 +139,11 @@ exports.newForm = async (req, res) => {
 // Acción: crear libro (recibe formulario)
 exports.create = async (req, res) => {
   try {
-    const book = await Book.create(req.body);
+    const bookData = { ...req.body };
+    if (req.file) {
+      bookData.cover_image = `/uploads/books/${req.file.filename}`;
+    }
+    const book = await Book.create(bookData);
 
     // Invalidador de caché
     await cacheService.invalidateOnBookChange(book.id);
@@ -167,7 +171,12 @@ exports.update = async (req, res) => {
   try {
     const book = await Book.findByPk(req.params.id);
     if (!book) return res.status(404).send('Libro no encontrado');
-    await book.update(req.body);
+
+    const bookData = { ...req.body };
+    if (req.file) {
+      bookData.cover_image = `/uploads/books/${req.file.filename}`;
+    }
+    await book.update(bookData);
 
     // Invalidador de caché
     await cacheService.invalidateOnBookChange(book.id);

@@ -1,14 +1,23 @@
 <div class="container mt-4">
   <div class="card">
-    <div class="card-body">
-      <h2 class="card-title"><%= book.title %></h2>
-      <p><strong>Género:</strong> <%= book.genre || 'N/A' %></p>
-      <p><strong>Autor:</strong> <%= book.Author ? book.Author.name : 'N/A' %></p>
-      <p><strong>Fecha de lanzamiento:</strong> <%= book.release_date || 'N/A' %></p>
-      <p><strong>Resumen:</strong> <%= book.summary || 'Sin resumen' %></p>
+    <div class="row g-0">
+      <% if (book.cover_image) { %>
+        <div class="col-md-3 text-center p-3">
+          <img src="<%= book.cover_image %>" alt="<%= book.title %>" class="img-fluid rounded shadow-sm" style="max-height: 280px; object-fit: cover;">
+        </div>
+      <% } %>
+      <div class="<%= book.cover_image ? 'col-md-9' : 'col-md-12' %>">
+        <div class="card-body">
+          <h2 class="card-title"><%= book.title %></h2>
+          <p><strong>Género:</strong> <%= book.genre || 'N/A' %></p>
+          <p><strong>Autor:</strong> <%= book.Author ? book.Author.name : 'N/A' %></p>
+          <p><strong>Fecha de lanzamiento:</strong> <%= book.release_date || 'N/A' %></p>
+          <p><strong>Resumen:</strong> <%= book.summary || 'Sin resumen' %></p>
 
-      <a href="/books/<%= book.id %>/edit" class="btn btn-warning">Editar</a>
-      <a href="/books" class="btn btn-secondary">← Volver</a>
+          <a href="/books/<%= book.id %>/edit" class="btn btn-warning">Editar</a>
+          <a href="/books" class="btn btn-secondary">← Volver</a>
+        </div>
+      </div>
     </div>
   </div>
 

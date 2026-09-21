@@ -35,7 +35,11 @@ exports.newForm = (req, res) => {
 // Acción: crear autor (recibe formulario)
 exports.create = async (req, res) => {
   try {
-    await Author.create(req.body);
+    const authorData = { ...req.body };
+    if (req.file) {
+      authorData.image = `/uploads/authors/${req.file.filename}`;
+    }
+    await Author.create(authorData);
 
     // Purgar la caché dependiente de los autores
     await cacheService.invalidateOnAuthorChange();
@@ -62,7 +66,12 @@ exports.update = async (req, res) => {
   try {
     const author = await Author.findByPk(req.params.id);
     if (!author) return res.status(404).send('Autor no encontrado');
-    await author.update(req.body);
+
+    const authorData = { ...req.body };
+    if (req.file) {
+      authorData.image = `/uploads/authors/${req.file.filename}`;
+    }
+    await author.update(authorData);
 
     // Purgar la caché dependiente de los autores
     await cacheService.invalidateOnAuthorChange();

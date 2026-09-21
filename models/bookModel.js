@@ -6,7 +6,8 @@ const Book = sequelize.define('Book', {
   title:  { type: DataTypes.STRING, allowNull: false },
   genre:  { type: DataTypes.STRING },
   summary: { type: DataTypes.TEXT },
-  release_date: {type: DataTypes.DATEONLY, defaultValue: DataTypes.NOW}
+  release_date: {type: DataTypes.DATEONLY, defaultValue: DataTypes.NOW},
+  cover_image: { type: DataTypes.STRING }
 });
 Author.hasMany(Book, { onDelete: 'CASCADE' });
 Book.belongsTo(Author);

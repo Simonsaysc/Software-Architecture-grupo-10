@@ -1,7 +1,7 @@
 <div class="container mt-4">
   <h2>Nuevo Libro</h2>
 
-  <form action="/books" method="POST">
+  <form action="/books" method="POST" enctype="multipart/form-data">
     <div class="mb-3">
       <label for="title" class="form-label">Título</label>
       <input type="text" class="form-control" id="title" name="title" required>
@@ -20,6 +20,11 @@
     <div class="mb-3">
       <label for="release_date" class="form-label">Fecha de lanzamiento</label>
       <input type="date" class="form-control" id="release_date" name="release_date">
+    </div>
+
+    <div class="mb-3">
+      <label for="cover_image" class="form-label">Portada del Libro (Imagen)</label>
+      <input type="file" class="form-control" id="cover_image" name="cover_image" accept="image/*">
     </div>
 
     <div class="mb-3">

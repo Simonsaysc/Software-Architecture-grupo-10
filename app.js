@@ -1,6 +1,7 @@
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
+const fs = require('fs');
 const sequelize = require('./config/db');
 const bookRoutes = require('./routes/bookRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
@@ -22,6 +23,13 @@ app.use(express.urlencoded({ extended: true }));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(expressLayouts); // Activamos el middleware para layouts
+
+// Servir archivos estáticos subidos (/uploads)
+const uploadsDir = process.env.UPLOADS_PATH || path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use('/uploads', express.static(uploadsDir));
 
 // Opcional: definir el layout por defecto (busca views/layout.ejs)
 app.set('layout', 'layout');

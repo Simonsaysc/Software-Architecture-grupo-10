@@ -1,7 +1,7 @@
 <div class="container mt-4">
   <h2>Nuevo Autor</h2>
 
-  <form action="/authors" method="POST">
+  <form action="/authors" method="POST" enctype="multipart/form-data">
     <div class="mb-3">
       <label for="name" class="form-label">Nombre</label>
       <input type="text" class="form-control" id="name" name="name" required>
@@ -15,6 +15,11 @@
     <div class="mb-3">
       <label for="birthdate" class="form-label">Fecha de nacimiento</label>
       <input type="date" class="form-control" id="birthdate" name="birthdate">
+    </div>
+
+    <div class="mb-3">
+      <label for="image" class="form-label">Foto del Autor (Imagen)</label>
+      <input type="file" class="form-control" id="image" name="image" accept="image/*">
     </div>
 
     <div class="mb-3">

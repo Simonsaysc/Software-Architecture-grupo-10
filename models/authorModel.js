@@ -4,6 +4,7 @@ const Author= sequelize.define('Author', {
   name:  { type: DataTypes.STRING, allowNull: false },
   bio: { type: DataTypes.TEXT },
   country: { type: DataTypes.STRING, allowNull: false },
-  birthdate: {type: DataTypes.DATEONLY, defaultValue: DataTypes.NOW}
+  birthdate: {type: DataTypes.DATEONLY, defaultValue: DataTypes.NOW},
+  image: { type: DataTypes.STRING }
 });
 module.exports = Author;
