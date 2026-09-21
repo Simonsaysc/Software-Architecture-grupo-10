@@ -34,8 +34,10 @@ services:
   app:
     build: .
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
+    deploy:
+      replicas: 3
     volumes:
       - .:/app
       - /app/node_modules
@@ -63,6 +65,7 @@ services:
       OPENSEARCH_REJECT_UNAUTHORIZED: "false"
       DOMAIN: ${DOMAIN:-bookreviews.localhost}
       UPLOADS_PATH: /app/uploads
+      SESSION_SECRET: ${SESSION_SECRET:-bookreviews_session_secret_key}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app.rule=Host(`bookreviews.localhost`) || Host(`bookreviews.local`) || Host(`localhost`)"
