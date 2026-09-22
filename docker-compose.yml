@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:latest
+    image: traefik:v3.7
     restart: always
     environment:
       - DOCKER_API_VERSION=1.44
