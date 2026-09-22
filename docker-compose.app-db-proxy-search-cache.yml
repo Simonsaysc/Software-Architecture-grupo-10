@@ -7,6 +7,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - ./uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -28,6 +29,16 @@ services:
       OPENSEARCH_USERNAME: ${OPENSEARCH_USERNAME}
       OPENSEARCH_PASSWORD: ${OPENSEARCH_PASSWORD}
       OPENSEARCH_REJECT_UNAUTHORIZED: "false"
+      DOMAIN: ${DOMAIN:-bookreviews.localhost}
+      UPLOADS_PATH: /app/uploads
+      SESSION_SECRET: ${SESSION_SECRET:-bookreviews_session_secret_key}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=Host(`bookreviews.localhost`) || Host(`bookreviews.local`) || Host(`localhost`)"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls=true"
+      - "traefik.http.routers.app.priority=50"
+      - "traefik.http.services.app.loadbalancer.server.port=3000"
   
   db:
     image: postgres:15-alpine
@@ -65,6 +76,39 @@ services:
       - OPENSEARCH_REJECT_UNAUTHORIZED=${OPENSEARCH_REJECT_UNAUTHORIZED}
     ports:
       - "9200:9200"
+  
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--configFile=/etc/traefik/traefik.yml"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/certs:/etc/traefik/certs:ro
+      - ./traefik/dynamic_conf.yml:/etc/traefik/dynamic_conf.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_data:/data
+  
+  static-nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - ./traefik/static-nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./uploads:/app/uploads:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.static-nginx.rule=Host(`bookreviews.localhost`) || Host(`bookreviews.local`) || Host(`localhost`)"
+      - "traefik.http.routers.static-nginx.entrypoints=websecure"
+      - "traefik.http.routers.static-nginx.tls=true"
+      - "traefik.http.routers.static-nginx.priority=100"
+      - "traefik.http.services.static-nginx.loadbalancer.server.port=80"
 
 volumes:
   db_data:
+  traefik_data:
+  uploads:
