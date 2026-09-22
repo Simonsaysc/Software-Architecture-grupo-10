@@ -1,0 +1,14 @@
+# Volumen compartido para las imagenes subidas (portadas y fotos de autor).
+# minikube tiene un solo nodo, asi que ReadWriteOnce basta para que las 3 replicas
+# lo monten a la vez. En un cluster multi-nodo se necesitaria ReadWriteMany
+# (NFS/EFS) o un object store (S3/MinIO).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

@@ -1,0 +1,72 @@
+# Servidor de estaticos en el borde: nginx lee las imagenes subidas directo del PVC compartido,
+# asi las portadas y fotos de autor no pasan por la app. Traefik enruta /uploads aqui
+# (ver k8s/ingress.yaml). Equivale al servicio static-assets de docker-compose.yml.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: static-nginx-config
+data:
+  default.conf: |
+    server {
+        listen 80;
+        server_name _;
+
+        location /uploads/ {
+            alias /var/www/uploads/;
+            autoindex off;
+            expires 365d;
+            add_header Cache-Control "public, max-age=31536000, immutable";
+            try_files $uri =404;
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: static-assets-deployment
+  labels:
+    app: static-assets
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: static-assets
+  template:
+    metadata:
+      labels:
+        app: static-assets
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: uploads
+              mountPath: /var/www/uploads
+              readOnly: true
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            periodSeconds: 5
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: uploads-pvc
+        - name: nginx-config
+          configMap:
+            name: static-nginx-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: static-assets-service
+spec:
+  type: ClusterIP
+  selector:
+    app: static-assets
+  ports:
+    - port: 80
+      targetPort: 80

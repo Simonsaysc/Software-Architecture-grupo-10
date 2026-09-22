@@ -13,3 +13,4 @@ data:
   ENABLE_SEARCH: "true"
   SEARCH_PROTOCOL: "https"
   OPENSEARCH_REJECT_UNAUTHORIZED: "false"
+  UPLOADS_PATH: /app/uploads

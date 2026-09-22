@@ -1,0 +1,73 @@
+# Edge con Traefik: TLS terminado aqui (secret bookreviews-tls), la app solo habla HTTP adentro.
+# Requiere Traefik instalado con Helm (k8s/traefik-values.yaml) y el secret TLS:
+#   kubectl create secret tls bookreviews-tls --cert=traefik/certs/cert.pem --key=traefik/certs/key.pem
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: static-cache
+spec:
+  headers:
+    customResponseHeaders:
+      Cache-Control: "public, max-age=31536000, immutable"
+      X-Served-By: "Traefik-Static-Cache"
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: gzip-compress
+spec:
+  compress: {}
+---
+# Aplicacion: todo lo que no sea /uploads va a las 3 replicas (Traefik balancea entre los endpoints)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-app-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: default-gzip-compress@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - bookreviews.localhost
+      secretName: bookreviews-tls
+  rules:
+    - host: bookreviews.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-app-service
+                port:
+                  number: 3000
+---
+# Estaticos: /uploads lo sirve nginx desde el PVC, con headers de cache y gzip (idea CDN)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: static-assets-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: default-static-cache@kubernetescrd,default-gzip-compress@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - bookreviews.localhost
+      secretName: bookreviews-tls
+  rules:
+    - host: bookreviews.localhost
+      http:
+        paths:
+          - path: /uploads
+            pathType: Prefix
+            backend:
+              service:
+                name: static-assets-service
+                port:
+                  number: 80

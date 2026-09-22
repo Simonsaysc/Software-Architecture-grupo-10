@@ -1,0 +1,15 @@
+# Valores para el chart oficial de Traefik (helm install traefik traefik/traefik -f k8s/traefik-values.yaml)
+# Traefik es el reverse proxy / edge del cluster: termina TLS, enruta por host/path
+# y reparte carga entre las 3 replicas de web-app-service.
+additionalArguments:
+  # Redireccion permanente HTTP -> HTTPS en el borde. Se usa ":443" (puerto expuesto por el Service)
+  # y no "websecure", porque websecure escucha en 8443 dentro del pod y el Location saldria con :8443
+  - "--entryPoints.web.http.redirections.entryPoint.to=:443"
+  - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
+  - "--entryPoints.web.http.redirections.entryPoint.permanent=true"
+service:
+  # En minikube (driver docker, macOS) se expone en 127.0.0.1:80/443 con `minikube tunnel`
+  type: LoadBalancer
+ingressRoute:
+  dashboard:
+    enabled: true

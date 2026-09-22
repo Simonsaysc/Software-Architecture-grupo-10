@@ -5,7 +5,7 @@ metadata:
   labels:
     app: web-app
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: web-app
@@ -94,16 +94,48 @@ spec:
                 secretKeyRef:
                   name: db-secret
                   key: OPENSEARCH_PASSWORD
+            # Uploads (almacenamiento compartido) y sesiones
+            - name: UPLOADS_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: UPLOADS_PATH
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: SESSION_SECRET
+          volumeMounts:
+            - name: uploads
+              mountPath: /app/uploads
+          readinessProbe:
+            httpGet:
+              path: /home
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /home
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: uploads-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: web-app-service
 spec:
-  type: NodePort
+  # ClusterIP: la app ya no se expone directo; solo se entra por Traefik (Ingress)
+  type: ClusterIP
   selector:
     app: web-app
   ports:
     - port: 3000
       targetPort: 3000
-      nodePort: 30080
