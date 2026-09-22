@@ -68,13 +68,14 @@ services:
     restart: unless-stopped
     volumes:
       - ./traefik/static-nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./uploads:/app/uploads:ro
+      - ./uploads:/var/www/uploads:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.static-nginx.rule=Host(`bookreviews.localhost`) || Host(`bookreviews.local`) || Host(`localhost`)"
+      - "traefik.http.routers.static-nginx.rule=(Host(`bookreviews.localhost`) || Host(`bookreviews.local`) || Host(`localhost`)) && PathPrefix(`/uploads`)"
       - "traefik.http.routers.static-nginx.entrypoints=websecure"
       - "traefik.http.routers.static-nginx.tls=true"
       - "traefik.http.routers.static-nginx.priority=100"
+      - "traefik.http.routers.static-nginx.middlewares=static-cache@file,gzip-compress@file"
       - "traefik.http.services.static-nginx.loadbalancer.server.port=80"
 
 volumes:
