@@ -1,0 +1,8 @@
+[x3] stress aggregation (dropped total=0)
+     25 req/s -> logrado   25.0  err=  0.0%  p50=    7.7ms  p95=   12.4ms
+     50 req/s -> logrado   50.0  err=  0.0%  p50=    5.1ms  p95=    7.7ms
+    100 req/s -> logrado  100.0  err=  0.0%  p50=    3.6ms  p95=    5.3ms
+    200 req/s -> logrado  200.1  err=  0.0%  p50=    2.6ms  p95=    4.3ms
+    300 req/s -> logrado  300.0  err=  0.0%  p50=    2.4ms  p95=    7.6ms
+    400 req/s -> logrado  400.0  err=  0.0%  p50=    2.3ms  p95=    4.7ms
+    600 req/s -> logrado  599.5  err=  0.0%  p50=    2.4ms  p95=    7.7ms

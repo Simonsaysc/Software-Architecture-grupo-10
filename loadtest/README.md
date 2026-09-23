@@ -68,3 +68,24 @@ Si se corta, se puede retomar solo con lo que falte (cada run escribe su propio 
 - **Todo corre en el mismo notebook**: k6, Docker y todos los contenedores comparten CPU.
   Las 3 réplicas no agregan CPU física, solo más procesos de Node (event loops) en paralelo.
 - 5000 requests en 5 minutos son ~17 req/s: es una carga moderada.
+
+## Prueba de estrés (adicional al enunciado)
+
+La carga del enunciado (máximo 5000 requests en 5 min ≈ 17 req/s) no satura ningún tier, así que
+1 y 3 instancias rinden igual. Para ver **dónde** se satura cada tier y si las 3 réplicas ayudan, hay una prueba
+extra: una escalera de tasas **25 → 50 → 100 → 200 → 300 → 400 → 600 req/s**, 40 s por escalón
+(+5 s de transición, que se excluye), por endpoint. Timeout por request: 10 s (cuenta como error).
+
+```bash
+# prueba rápida del harness (~30 s)
+STEPS=10,20 STEP_SECONDS=10 COOLDOWN=5 bash loadtest/stress.sh single detail
+
+bash loadtest/prepare.sh single && caffeinate -dimsu bash loadtest/stress.sh single   # ~25 min
+bash loadtest/prepare.sh x3     && caffeinate -dimsu bash loadtest/stress.sh x3       # ~25 min
+python3 loadtest/stress_aggregate.py
+```
+
+Resultado: `results/stress/stress_summary.csv`, con una fila por (endpoint, escalón, deployment): tasa lograda,
+% de error, p50/p95/p99 y CPU/memoria/PIDs por rol. La saturación se ve cuando la tasa lograda
+deja de seguir a la objetivo, cuando sube el p95 o cuando aparecen errores. El rol cuya CPU se acerca a su tope en ese momento es el
+cuello de botella (la app es Node de un hilo: ~100% por instancia).

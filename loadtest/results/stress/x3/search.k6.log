@@ -1,0 +1,9 @@
+time="2026-09-23T18:44:50-03:00" level=warning msg="Insufficient VUs, reached 3000 active VUs and cannot initialize more" executor=ramping-arrival-rate scenario=stress
+[x3] stress search (dropped total=5139)
+     25 req/s -> logrado   25.0  err=  0.0%  p50=   11.0ms  p95=   14.8ms
+     50 req/s -> logrado   50.0  err=  0.0%  p50=    8.3ms  p95=   11.2ms
+    100 req/s -> logrado  100.0  err=  0.0%  p50=    7.1ms  p95=   10.0ms
+    200 req/s -> logrado  200.0  err=  0.0%  p50=    7.0ms  p95=   10.6ms
+    300 req/s -> logrado  300.0  err=  0.0%  p50=    7.4ms  p95=   13.0ms
+    400 req/s -> logrado  400.0  err=  0.0%  p50=    8.1ms  p95=   14.7ms
+    600 req/s -> logrado  471.9  err=  0.0%  p50= 3052.4ms  p95= 7753.6ms

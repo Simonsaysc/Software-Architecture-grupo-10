@@ -1,0 +1,8 @@
+[single] stress static (dropped total=0)
+     25 req/s -> logrado   25.0  err=  0.0%  p50=    8.0ms  p95=   10.9ms
+     50 req/s -> logrado   50.0  err=  0.0%  p50=    4.7ms  p95=    8.0ms
+    100 req/s -> logrado  100.0  err=  0.0%  p50=    3.1ms  p95=    4.6ms
+    200 req/s -> logrado  200.0  err=  0.0%  p50=    2.1ms  p95=    3.3ms
+    300 req/s -> logrado  300.0  err=  0.0%  p50=    1.8ms  p95=    2.8ms
+    400 req/s -> logrado  400.0  err=  0.0%  p50=    1.8ms  p95=    2.7ms
+    600 req/s -> logrado  600.0  err=  0.0%  p50=    2.0ms  p95=    5.1ms
