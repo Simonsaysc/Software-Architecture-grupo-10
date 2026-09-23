@@ -1,0 +1,28 @@
+{
+  "deployment": "single",
+  "endpoint": "search",
+  "requests_target": 5000,
+  "duration": "5m",
+  "started_at": "2026-09-22T22:30:14.463Z",
+  "finished_at": "2026-09-22T22:35:14.567Z",
+  "requests_sent": 5000,
+  "dropped_iterations": 0,
+  "status": {
+    "2xx": 5000,
+    "3xx": 0,
+    "4xx": 0,
+    "5xx": 0,
+    "error": 0
+  },
+  "latency_ms": {
+    "avg": 13.66496480000002,
+    "min": 5.703,
+    "med": 13.46,
+    "p90": 18.3901,
+    "p95": 19.7201,
+    "p99": 22.427329999999998,
+    "max": 63.721
+  },
+  "throughput_rps": 16.66089361149397,
+  "max_vus": 50
+}

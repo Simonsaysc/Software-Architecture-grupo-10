@@ -1,0 +1,1 @@
+[single] static x10: 2xx=10 4xx=0 5xx=0 err=0 p50=6.7ms p95=17.3ms max=18.9ms dropped=0

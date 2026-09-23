@@ -1,0 +1,1 @@
+[single] static x5000: 2xx=5000 4xx=0 5xx=0 err=0 p50=8.6ms p95=11.1ms max=44.3ms dropped=0

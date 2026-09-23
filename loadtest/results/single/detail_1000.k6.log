@@ -1,0 +1,1 @@
+[single] detail x1000: 2xx=1000 4xx=0 5xx=0 err=0 p50=15.1ms p95=18.2ms max=48.1ms dropped=0

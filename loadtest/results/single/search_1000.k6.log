@@ -1,0 +1,1 @@
+[single] search x1000: 2xx=1000 4xx=0 5xx=0 err=0 p50=25.1ms p95=32.5ms max=46.7ms dropped=0

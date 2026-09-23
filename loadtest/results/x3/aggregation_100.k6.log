@@ -1,0 +1,1 @@
+[x3] aggregation x100: 2xx=100 4xx=0 5xx=0 err=0 p50=10.7ms p95=24.5ms max=48.3ms dropped=0

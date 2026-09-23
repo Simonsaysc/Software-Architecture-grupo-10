@@ -1,0 +1,1 @@
+[single] aggregation x1: 2xx=1 4xx=0 5xx=0 err=0 p50=8.7ms p95=8.7ms max=8.7ms dropped=0

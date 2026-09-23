@@ -1,0 +1,28 @@
+{
+  "deployment": "x3",
+  "endpoint": "detail",
+  "requests_target": 10,
+  "duration": "5m",
+  "started_at": "2026-09-23T20:10:27.031Z",
+  "finished_at": "2026-09-23T20:15:27.105Z",
+  "requests_sent": 10,
+  "dropped_iterations": 0,
+  "status": {
+    "2xx": 10,
+    "3xx": 0,
+    "4xx": 0,
+    "5xx": 0,
+    "error": 0
+  },
+  "latency_ms": {
+    "avg": 38.5663,
+    "min": 22.37,
+    "med": 39.912,
+    "p90": 48.3271,
+    "p95": 51.77455,
+    "p99": 54.53251,
+    "max": 55.222
+  },
+  "throughput_rps": 0.033325119468970356,
+  "max_vus": 10
+}
