@@ -7,6 +7,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - ./uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -17,6 +18,9 @@ services:
       DB_NAME: ${DB_NAME}
       ENABLE_CACHE: "false"
       ENABLE_SEARCH: "false"
+      UPLOADS_PATH: /app/uploads
+      SERVE_STATIC: "true"
+      SESSION_SECRET: ${SESSION_SECRET:-bookreviews_session_secret_key}
   
   db:
     image: postgres:15-alpine

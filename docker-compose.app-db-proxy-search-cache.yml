@@ -31,6 +31,7 @@ services:
       OPENSEARCH_REJECT_UNAUTHORIZED: "false"
       DOMAIN: ${DOMAIN:-bookreviews.localhost}
       UPLOADS_PATH: /app/uploads
+      SERVE_STATIC: "false"
       SESSION_SECRET: ${SESSION_SECRET:-bookreviews_session_secret_key}
     labels:
       - "traefik.enable=true"

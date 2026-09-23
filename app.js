@@ -76,7 +76,15 @@ const uploadsDir = process.env.UPLOADS_PATH || path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
-app.use('/uploads', express.static(uploadsDir));
+// SERVE_STATIC=false cuando hay reverse proxy: los estaticos los sirve (y cachea) el edge, no Express.
+// Sin proxy (default) la app los sirve ella misma.
+const serveStatic = (process.env.SERVE_STATIC || 'true').toLowerCase() !== 'false';
+if (serveStatic) {
+  app.use('/uploads', express.static(uploadsDir));
+  console.log(`[static] Serving /uploads from ${uploadsDir}`);
+} else {
+  console.log('[static] SERVE_STATIC=false: /uploads is served by the reverse proxy');
+}
 
 // Opcional: definir el layout por defecto (busca views/layout.ejs)
 app.set('layout', 'layout');

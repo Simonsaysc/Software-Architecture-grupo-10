@@ -100,6 +100,11 @@ spec:
                 configMapKeyRef:
                   name: app-config
                   key: UPLOADS_PATH
+            - name: SERVE_STATIC
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SERVE_STATIC
             - name: SESSION_SECRET
               valueFrom:
                 secretKeyRef:
